@@ -1,7 +1,8 @@
 var express = require('express');
 var app = express();
 var router = express.Router();
-var port_number = 8888;
+
+app.set('port', (process.env.PORT || 5000));
 
 var static_options = {
 
@@ -9,6 +10,6 @@ var static_options = {
 
 app.use(express.static('public', static_options));
 
-app.listen(port_number);
-
-console.log("Application listening on port: " + port_number);
+app.listen(app.get('port'), function() {
+	console.log("Node app is running locally on port: " + app.get('port'));
+});
