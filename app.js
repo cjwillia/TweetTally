@@ -1,7 +1,6 @@
 var express = require('express');
 var app = express();
 var router = express.Router();
-var request = require('request');
 
 app.set('port', (process.env.PORT || 5000));
 
