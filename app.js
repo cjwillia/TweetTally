@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var router = express.Router();
+var request = require('request');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -20,23 +21,9 @@ var client = new Twitter({
 	access_secret: process.env.TWITTER_ACCESS_SECRET
 });
 
-client.authorize_user = function(username, callback) {
-	client.get('oauth/authorize', {screen_name: username}, callback);
-}
-
-client.authorize = function(callback) {
-	client.get('oauth/authorize', callback);
-}
 
 app.get('/login', function(req, res) {
-	function respond(error, response) {
-		if(error) throw error;
-		res.send(response);
-	}
-	// this would maybe be a fancier way to handle this? I might have some closure fuckups here
-	// var handle = req.params.handle;
-	// handle === "" ? client.authorize(respond) : client.authorize_user(handle, respond);
-	client.get('oauth/authenticate', {}, function(error, response){
+	client.get('favorites/list', function(error, tweets, response){
 		//if(error) throw error;
 		console.log(response);
 		res.send("<p>Something Happened!11!</p>")
