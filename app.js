@@ -20,6 +20,23 @@ var client = new Twitter({
 	access_secret: process.env.TWITTER_ACCESS_SECRET
 });
 
+client.authorize_user = function(username, callback) {
+	client.get('oauth/authorize', {screen_name: username}, callback);
+}
+
+client.authorize = function(callback) {
+	client.get('oauth/authorize', callback);
+}
+
+app.get('/login', function(req, res) {
+	function respond(error, response) {
+		if(error) throw error;
+		res.send(response);
+	}
+	var handle = req.params.handle;
+	handle === "" ? client.authorize(respond) : client.authorize_user(handle, respond); 
+});
+
 app.listen(app.get('port'), function() {
 	console.log("Node app is running locally on port: " + app.get('port'));
 });
