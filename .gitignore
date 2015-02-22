@@ -1,2 +1,2 @@
 # Ignore the Procfile for Heroku deployment
-/Procfile
+#/Procfile
