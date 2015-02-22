@@ -36,7 +36,7 @@ app.get('/login', function(req, res) {
 	// this would maybe be a fancier way to handle this? I might have some closure fuckups here
 	// var handle = req.params.handle;
 	// handle === "" ? client.authorize(respond) : client.authorize_user(handle, respond);
-	client.get('oauth/authorize', {}, function(error, response){
+	client.get('oauth/authenticate', {}, function(error, response){
 		//if(error) throw error;
 		console.log(response);
 		res.send("<p>Something Happened!11!</p>")
