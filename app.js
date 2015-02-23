@@ -4,7 +4,9 @@ var router = express.Router();
 var session = require('cookie-session');
 
 app.set('port', (process.env.PORT || 5000));
-app.use(session());
+app.use(session({
+	keys: ['thisiskey1', 'thisiskey2']
+}));
 
 var static_options = {
 
