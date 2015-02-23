@@ -24,7 +24,7 @@ var twitter = new twitterAPI({
 app.get('/reqToken', function(req, res) {
 	twitter.getRequestToken(function(error, requestToken, requestTokenSecret, results){
 		if(error) {
-			console.log(error);
+			res.send(error);
 		}
 		else {
 			req.session.requestToken = requestToken;
