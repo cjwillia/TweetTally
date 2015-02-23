@@ -14,36 +14,32 @@ var static_options = {
 
 app.use(express.static('public', static_options));
 
-var twitterAPI = require('node-twitter-api');
-var twitter = new twitterAPI({
-	consumerKey: "2no6xxLelJ2IqEmagCsBtksdl",
-	consumerSecret: "ZzJZv1YdJsHucgvWigUJ9w5bFWzc7r6nPn4WW8TIqZlE0j26my",
-	callback: 'https://floating-sierra-5718.herokuapp.com/extra.html'
+var Twitter = require('twitter');
+
+var client= new Twitter({
+	consumer_key: process.env.TWITTER_CONSUMER_KEY,
+	consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+	access_token_key: process.env.TWITTER_ACCESS_KEY,
+	access_token_secret: process.env.TWITTER_ACCESS_SECRET
 });
 
+var params = {screen_name: 'thedreadjesus'};
+
+
+
 app.get('/reqToken', function(req, res) {
-	twitter.getRequestToken(function(error, requestToken, requestTokenSecret, results){
-		if(error) {
-			res.send(error);
+	client.get('statuses/user_timeline', params, function(error, tweets, response) {
+		if(!error) {
+			console.log(tweets);
 		}
 		else {
-			req.session.requestToken = requestToken;
-			req.session.requestTokenSecret = requestTokenSecret;
-			res.redirect(twitter.getAuthUrl(req.session.requestToken));
+			res.send(error);
 		}
-	});
+	})
 });
 
 app.get('/extra', function(req, res) {
-	twitter.getAccessToken(req.requestToken, req.session.requestTokenSecret, req.query.oauth_verifier, function(error, accessToken, accessTokenSecret, results) {
-		if(error) {
-			console.log(error);
-		}
-		else {
-			req.session.accessToken = accessToken;
-			req.session.accessTokenSecret = accessTokenSecret;
-		}
-	});
+
 });
 
 app.listen(app.get('port'), function() {
