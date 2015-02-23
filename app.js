@@ -1,11 +1,9 @@
 var express = require('express');
 var app = express();
 var router = express.Router();
-var cookieParser = require('cookie-parser');
 var session = require('cookie-session');
 
 app.set('port', (process.env.PORT || 5000));
-app.use(cookieParser());
 app.use(session());
 
 var static_options = {
