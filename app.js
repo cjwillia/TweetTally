@@ -25,11 +25,24 @@ var mongodb = require('mongodb');
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI);
 
+function callback() {
+	//temporary function for mongo tutorial
+
+	var kittySchema = mongoose.Schema({
+		name: String
+	});
+
+	var Kitten = mongoose.model('Kitten', kittySchema);
+
+	var silence = new Kitten({name: 'Silence'});
+	console.log(silence.name);
+
+	
+}
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function(callback){
-	console.log('database opened!');
-});
+db.once('open', callback);
 
 var params = {screen_name: 'thedreadjesus'};
 
