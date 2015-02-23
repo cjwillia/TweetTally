@@ -16,8 +16,8 @@ app.use(express.static('public', static_options));
 
 var twitterAPI = require('node-twitter-api');
 var twitter = new twitterAPI({
-	consumerKey: process.env.TWITTER_CONSUMER_KEY,
-	consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+	consumerKey: "2no6xxLelJ2IqEmagCsBtksdl",
+	consumerSecret: "ZzJZv1YdJsHucgvWigUJ9w5bFWzc7r6nPn4WW8TIqZlE0j26my",
 	callback: 'https://floating-sierra-5718.herokuapp.com/extra.html'
 });
 
