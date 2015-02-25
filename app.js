@@ -26,17 +26,29 @@ var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI);
 
 function callback() {
-	//temporary function for mongo tutorial
 
-	var kittySchema = mongoose.Schema({
-		name: String
+	var tweetInfoSchema = mongoose.Schema({
+		year: Number,
+		month: Number,
+		day: Number,
+		hour: Number,
+		minute: Number,
+		second: Number,
+		tweet_id: Number,
+		text: String,
+		favorites: Number,
+		retweets: Number
 	});
 
-	var Kitten = mongoose.model('Kitten', kittySchema);
+	var userSchema = mongoose.Schema({
+		handle: String,
+		favorites_today: Number,
+		retweets_today: Number,
+		children: [tweetInfoSchema]
+	});
 
-	var silence = new Kitten({name: 'Silence'});
-	console.log(silence.name);
-
+	var Tweet = mongoose.model('Tweet', tweetInfoSchema);
+	var User = mongoose.model('User', userSchema);
 	
 }
 
@@ -46,9 +58,12 @@ db.once('open', callback);
 
 var params = {screen_name: 'thedreadjesus'};
 
-app.get('/reqToken', function(req, res) {
+app.get('/:user/tweets', function(req, res) {
+	var params = {screen_name:req.params.user};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
 		if(!error) {
+			// find out if the any of the tweets are already in the database
+			// if they are not, store them
 			res.send(tweets);
 		}
 		else {
@@ -57,8 +72,15 @@ app.get('/reqToken', function(req, res) {
 	})
 });
 
-app.get('/extra', function(req, res) {
+app.get('/:user/favorites', function(req, res) {
+	var params = {screen_name:req.params.user};
+	// get the user's day timeline (userSchema.children)
+	// for each tweet with favorites, take down the time and number of favorites
+	// send back an object with that information on it
+});
 
+app.get('/extra', function(req, res) {
+	
 });
 
 app.listen(app.get('port'), function() {
