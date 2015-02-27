@@ -34,11 +34,31 @@ function callback() {
 		hour: Number,
 		minute: Number,
 		second: Number,
-		tweet_id: Number,
+		tweet_id: String,
 		text: String,
 		favorites: Number,
 		retweets: Number
 	});
+
+	tweetInfoSchema.methods.load_info = function(tweet) {
+		this.favorites = tweet.favorite_count;
+		this.retweets = tweet.retweet_count;
+		this.text = tweet.text;
+		this.tweet_id = tweet.id_str;
+		var that = this;
+
+		function dateHelper(date) {
+			this.year = date.getYears();
+			this.month = date.getMonths();
+			this.day = date.getDays();
+			this.hour = date.getHours();
+			this.minute = date.getMinutes();
+			this.seconds = date.getSeconds();
+		}
+		
+		var d = new Date(tweet.created_at);
+		dateHelper(d);
+	};
 
 	var userSchema = mongoose.Schema({
 		handle: String,
@@ -55,8 +75,6 @@ function callback() {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', callback);
-
-var params = {screen_name: 'thedreadjesus'};
 
 app.get('/:user/tweets', function(req, res) {
 	var params = {screen_name:req.params.user};
