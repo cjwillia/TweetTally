@@ -28,16 +28,31 @@ mongoose.connect(process.env.MONGOLAB_URI);
 function callback() {
 
 	var tweetInfoSchema = mongoose.Schema({
-		year: Number,
-		month: Number,
-		day: Number,
-		hour: Number,
-		minute: Number,
-		second: Number,
+		date: Date,
 		tweet_id: String,
 		text: String,
 		favorites: Number,
 		retweets: Number
+	});
+
+	tweetInfoSchema.virtual('date.year').get(function() {
+		return this.date.getYears();
+	});
+
+	tweetInfoSchema.virtual('date.month').get(function() {
+		return this.date.getMonths();
+	});
+	tweetInfoSchema.virtual('date.day').get(function() {
+		return this.date.getDays();
+	});
+	tweetInfoSchema.virtual('date.hour').get(function() {
+		return this.date.getHours();
+	});
+	tweetInfoSchema.virtual('date.minute').get(function() {
+		return this.date.getMinutes();
+	});
+	tweetInfoSchema.virtual('date.second').get(function() {
+		return this.date.getSeconds();
 	});
 
 	tweetInfoSchema.methods.load_info = function(tweet) {
@@ -55,7 +70,7 @@ function callback() {
 			this.minute = date.getMinutes();
 			this.seconds = date.getSeconds();
 		}
-		
+
 		var d = new Date(tweet.created_at);
 		dateHelper(d);
 	};
@@ -64,8 +79,33 @@ function callback() {
 		handle: String,
 		favorites_today: Number,
 		retweets_today: Number,
+		max_id: String,
 		children: [tweetInfoSchema]
 	});
+
+	userSchema.methods.addTweets = function(timeline) {
+		var nextDayReached = false;
+		for(var i = 0; i < timeline.length; i++) {
+			// pull tweets until previous day
+			var tweet = timeline[i];
+			var d = new Date(tweet.created_at);
+			var today = new Date();
+
+			if(d.getDays() < today.getDays()) {
+				nextDayReached = true;
+			}
+			else {
+				this.children.push()
+				//do everything else. store it
+				if(i === timeline.length - 1) {
+					// last index
+					this.max_id = tweet.id;
+				}
+			}
+
+			
+		}
+	}
 
 	var Tweet = mongoose.model('Tweet', tweetInfoSchema);
 	var User = mongoose.model('User', userSchema);
@@ -76,18 +116,31 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', callback);
 
+app.get('/:user/update', function(req, res) {
+	var obj = {screen_name:req.params.user};
+	client.get('statuses/user_timeline', obj, function(error, tweets, response) {
+		if(!error) {
+			// first, check to see if the user is in the database
+			// grab 100 tweets, check to see if anything low is the previous day.
+			// if not, grab 100 more 
+
+		}
+		else {
+			res.send(error);
+		}
+	});
+});
+
 app.get('/:user/tweets', function(req, res) {
 	var params = {screen_name:req.params.user};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
 		if(!error) {
-			// find out if the any of the tweets are already in the database
-			// if they are not, store them
 			res.send(tweets);
 		}
 		else {
 			res.send(error);
 		}
-	})
+	});
 });
 
 app.get('/:user/favorites', function(req, res) {
