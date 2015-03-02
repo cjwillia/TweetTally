@@ -25,7 +25,7 @@ var mongodb = require('mongodb');
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI);
 
-function callback() {
+function setupDatabase() {
 
 	var tweetInfoSchema = mongoose.Schema({
 		date: Date,
@@ -42,37 +42,31 @@ function callback() {
 	tweetInfoSchema.virtual('date.month').get(function() {
 		return this.date.getMonths();
 	});
+
 	tweetInfoSchema.virtual('date.day').get(function() {
 		return this.date.getDays();
 	});
+
 	tweetInfoSchema.virtual('date.hour').get(function() {
 		return this.date.getHours();
 	});
+
 	tweetInfoSchema.virtual('date.minute').get(function() {
 		return this.date.getMinutes();
 	});
+
 	tweetInfoSchema.virtual('date.second').get(function() {
 		return this.date.getSeconds();
-	});
+	});	
 
 	tweetInfoSchema.methods.load_info = function(tweet) {
+		var d = new Date(tweet.created_at);
+
 		this.favorites = tweet.favorite_count;
 		this.retweets = tweet.retweet_count;
 		this.text = tweet.text;
 		this.tweet_id = tweet.id_str;
-		var that = this;
-
-		function dateHelper(date) {
-			this.year = date.getYears();
-			this.month = date.getMonths();
-			this.day = date.getDays();
-			this.hour = date.getHours();
-			this.minute = date.getMinutes();
-			this.seconds = date.getSeconds();
-		}
-
-		var d = new Date(tweet.created_at);
-		dateHelper(d);
+		this.date = d;
 	};
 
 	var userSchema = mongoose.Schema({
@@ -93,13 +87,22 @@ function callback() {
 
 			if(d.getDays() < today.getDays()) {
 				nextDayReached = true;
+				this.max_id = tweet.id;
 			}
 			else {
+				// do everything else. store it
+				// TODO: fix this line. add a tweetinfo object and call its load_info method
+				var t = new Tweet({});
 				this.children.push()
-				//do everything else. store it
 				if(i === timeline.length - 1) {
 					// last index
-					this.max_id = tweet.id;
+					if(nextDayReached) {
+						return true;
+					}
+					else {
+						this.max_id = tweet.id;
+						return false;
+					}
 				}
 			}
 
@@ -114,7 +117,7 @@ function callback() {
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', callback);
+db.once('open', setupDatabase);
 
 app.get('/:user/update', function(req, res) {
 	var obj = {screen_name:req.params.user};
