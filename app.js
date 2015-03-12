@@ -81,57 +81,79 @@ function setupDatabase() {
 		var nextDayReached = false;
 		for(var i = 0; i < timeline.length; i++) {
 			// pull tweets until previous day
-			var tweet = timeline[i];
-			var d = new Date(tweet.created_at);
+			var timeline_obj = timeline[i];
+			var d = new Date(timeline_obj.created_at);
 			var today = new Date();
 
 			if(d.getDays() < today.getDays()) {
 				nextDayReached = true;
-				this.max_id = tweet.id;
+				this.max_id = timeline_obj.id;
 			}
 			else {
 				// do everything else. store it
 				// TODO: fix this line. add a tweetinfo object and call its load_info method
 				var t = new Tweet({});
-				this.children.push()
+				t.load_info(timeline_obj);
+				this.children.push(t);
 				if(i === timeline.length - 1) {
 					// last index
-					if(nextDayReached) {
-						return true;
-					}
-					else {
-						this.max_id = tweet.id;
-						return false;
+					if(!nextDayReached) {
+						this.max_id = timeline_obj.id;
 					}
 				}
-			}
-
-			
+			}	
 		}
+		return nextDayReached;
 	}
 
-	var Tweet = mongoose.model('Tweet', tweetInfoSchema);
-	var User = mongoose.model('User', userSchema);
-	
+	Tweet = mongoose.model('Tweet', tweetInfoSchema);
+	User = mongoose.model('User', userSchema);
+	console.log('Tweets and Users are set up.');
 }
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
+var Tweet;
+var User;
 db.once('open', setupDatabase);
 
 app.get('/:user/update', function(req, res) {
-	var obj = {screen_name:req.params.user};
-	client.get('statuses/user_timeline', obj, function(error, tweets, response) {
-		if(!error) {
-			// first, check to see if the user is in the database
-			// grab 100 tweets, check to see if anything low is the previous day.
-			// if not, grab 100 more 
-
-		}
+	var obj = { screen_name:req.params.user };
+	var done = false;
+	var updating_user;
+	User.count({'handle': obj.screen_name}, function(err, count) {
+		if(err)
+			console.log(err);
 		else {
-			res.send(error);
+			if(count === 0) {
+				updating_user = new User({handle: obj.screen_name});
+			}
+			else {
+				User.findOne({'handle': obj.screen_name}, function(err, u) {
+					if(err)
+						console.log(err);
+					else
+						updating_user = u;
+				});
+			}
 		}
 	});
+	if(typeof updating_user !== "undefined") {
+		var counter = 0;
+		while(!done) {
+			client.get('statuses/user_timeline', obj, function(error, tweets, response) {
+				if(!error) {
+					counter += 1;
+					done = updating_user.addTweets(tweets);
+					console.log("successfully found and added tweets. times: " + counter);
+				}
+				else {
+					res.send(error);
+				}
+			});		
+		}
+	}
+	console.log("User successfully updated");
 });
 
 app.get('/:user/tweets', function(req, res) {
