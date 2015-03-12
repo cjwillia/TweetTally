@@ -157,13 +157,25 @@ app.get('/:user/update', function(req, res) {
 });
 
 app.get('/:user/tweets', function(req, res) {
-	var params = {screen_name:req.params.user};
-	client.get('statuses/user_timeline', params, function(error, tweets, response) {
-		if(!error) {
-			res.send(tweets);
-		}
+	User.count({'handle': req.params.user}, function(err, count) {
+		if(err)
+			console.log(err);
 		else {
-			res.send(error);
+			if(count === 1) {
+				User.findOne({'handle': req.params.user}, function(err, u) {
+					if(err)
+						console.log(err);
+					else {
+						res.send("I found it! it's " + u.handle);
+					}
+				});
+			}
+			else if(count === 0) {
+				res.send("Hey, this user doesn't exist in the system yet. Add them with the /update URL");
+			}
+			else {
+				console.log('something has gone wrong here');
+			}
 		}
 	});
 });
