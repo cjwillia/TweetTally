@@ -126,6 +126,7 @@ app.get('/:user/update', function(req, res) {
 			console.log(err);
 		else {
 			if(count === 0) {
+				console.log("Creating new user...");
 				updating_user = new User({handle: obj.screen_name});
 			}
 			else {
@@ -134,26 +135,32 @@ app.get('/:user/update', function(req, res) {
 						console.log(err);
 					else
 						updating_user = u;
+						console.log("User located in database.")
 				});
 			}
 		}
-	});
-	if(typeof updating_user !== "undefined") {
-		var counter = 0;
-		while(!done) {
-			client.get('statuses/user_timeline', obj, function(error, tweets, response) {
-				if(!error) {
-					counter += 1;
-					done = updating_user.addTweets(tweets);
-					console.log("successfully found and added tweets. times: " + counter);
-				}
-				else {
-					res.send(error);
-				}
-			});		
+
+		if(typeof updating_user !== "undefined") {
+			var counter = 0;
+			while(!done) {
+				client.get('statuses/user_timeline', obj, function(error, tweets, response) {
+					if(!error) {
+						counter += 1;
+						done = updating_user.addTweets(tweets);
+						console.log("successfully found and added tweets. times: " + counter);
+					}
+					else {
+						res.send(error);
+					}
+				});		
+			}
+			console.log('User successfully updated.');
 		}
-	}
-	console.log("User successfully updated");
+		else {
+			console.log('ERROR: User was not found or added to the database.')
+		}
+	});
+	res.send("Update Page. This should redirect.")
 });
 
 app.get('/:user/tweets', function(req, res) {
