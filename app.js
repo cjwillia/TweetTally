@@ -25,6 +25,12 @@ var mongodb = require('mongodb');
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI);
 
+// helper to log errors and send info back to the client
+function handleError(err, res) {
+	console.log(err);
+	res.send("Sorry, there was an error in the server. Try navigating to the previous page.");
+}
+
 function setupDatabase() {
 
 	var tweetInfoSchema = mongoose.Schema({
@@ -117,52 +123,68 @@ var Tweet;
 var User;
 db.once('open', setupDatabase);
 
+// helper function for user updating
+
+function getTweets(user, res) {
+	var done = false;
+	if(typeof user !== "undefined") {
+		var counter = 0;
+		while(!done) {
+			client.get('statuses/user_timeline', obj, function(err, tweets, response) {
+				if(err)
+					console.log(err);
+				else {
+					counter += 1;
+					done = user.addTweets(tweets);
+					console.log("successfully found and added tweets. times: " + counter);
+				}
+			});		
+		}
+		if(counter === 0) {
+			console.log('No tweets added');
+		}
+		else {
+			console.log('User Updated!')
+		}
+	}
+	else {
+		console.log('ERROR: User was not found or added to the database.');
+	}
+}
+
 app.get('/:user/update', function(req, res) {
 	var obj = { screen_name:req.params.user };
-	var done = false;
 	var updating_user;
 	console.log("Finding users...");
 	User.count({'handle': obj.screen_name}, function(err, count) {
 		if(err)
-			console.log(err);
+			handleError(err, res);
 		else {
 			if(count === 0) {
 				console.log("Creating new user...");
 				updating_user = new User({handle: obj.screen_name});
-
+				updating_user.save(function(err) {
+					if(err)
+						handleError(err, res);
+					else {
+						console.log("User saved to database!");
+						getTweets(updating_user, res);
+					}
+				});
 			}
 			else {
 				User.findOne({'handle': obj.screen_name}, function(err, u) {
 					if(err)
-						console.log(err);
+						handleError(err, res);
 					else
 						updating_user = u;
-						console.log("User located in database.")
+						console.log("User located in database.");
+						getTweets(updating_user, res);
 				});
 			}
 		}
-
-		if(typeof updating_user !== "undefined") {
-			var counter = 0;
-			while(!done) {
-				client.get('statuses/user_timeline', obj, function(error, tweets, response) {
-					if(!error) {
-						counter += 1;
-						done = updating_user.addTweets(tweets);
-						console.log("successfully found and added tweets. times: " + counter);
-					}
-					else {
-						res.send(error);
-					}
-				});		
-			}
-			console.log('User successfully updated.');
-		}
-		else {
-			console.log('ERROR: User was not found or added to the database.')
-		}
 	});
-	res.send("Update Page. This should redirect.")
+	res.send("Update Page. This should redirect to the person's tweets.");
 });
 
 app.get('/:user/tweets', function(req, res) {
