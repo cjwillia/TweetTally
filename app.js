@@ -85,6 +85,7 @@ function setupDatabase() {
 
 	userSchema.methods.addTweets = function(timeline) {
 		var nextDayReached = false;
+		console.log('Adding tweets to user ' + this.handle);
 		for(var i = 0; i < timeline.length; i++) {
 			// pull tweets until previous day
 			var timeline_obj = timeline[i];
@@ -126,6 +127,7 @@ db.once('open', setupDatabase);
 // helper function for user updating
 
 function getTweets(user, res) {
+	console.log('Getting tweets for user ' + user.handle);
 	var done = false;
 	var obj = {screen_name:user.handle};
 	if(typeof user !== "undefined") {
@@ -145,7 +147,12 @@ function getTweets(user, res) {
 			console.log('No tweets added');
 		}
 		else {
-			console.log('User Updated!')
+			updating_user.save(function(err) {
+				if(err)
+					console.log(err);
+				else
+					console.log('User Updated!')
+			});
 		}
 	}
 	else {
