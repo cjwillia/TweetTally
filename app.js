@@ -127,6 +127,7 @@ db.once('open', setupDatabase);
 
 function getTweets(user, res) {
 	var done = false;
+	var obj = {screen_name:user.handle};
 	if(typeof user !== "undefined") {
 		var counter = 0;
 		while(!done) {
