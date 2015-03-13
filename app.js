@@ -121,6 +121,7 @@ app.get('/:user/update', function(req, res) {
 	var obj = { screen_name:req.params.user };
 	var done = false;
 	var updating_user;
+	console.log("Finding users...");
 	User.count({'handle': obj.screen_name}, function(err, count) {
 		if(err)
 			console.log(err);
@@ -128,6 +129,7 @@ app.get('/:user/update', function(req, res) {
 			if(count === 0) {
 				console.log("Creating new user...");
 				updating_user = new User({handle: obj.screen_name});
+
 			}
 			else {
 				User.findOne({'handle': obj.screen_name}, function(err, u) {
