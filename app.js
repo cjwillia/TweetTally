@@ -92,13 +92,15 @@ function setupDatabase() {
 			var d = new Date(timeline_obj.created_at);
 			var today = new Date();
 
-			if(d.getDays() < today.getDays()) {
+			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
+				console.log("Found oldest tweet today"); // this one's temporary
 				nextDayReached = true;
 				this.max_id = timeline_obj.id;
 			}
 			else {
 				// do everything else. store it
 				// TODO: fix this line. add a tweetinfo object and call its load_info method
+				console.log("Storing Tweet of id: " + timeline_obj.id);
 				var t = new Tweet({});
 				t.load_info(timeline_obj);
 				this.children.push(t);
