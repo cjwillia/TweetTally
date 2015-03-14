@@ -42,15 +42,15 @@ function setupDatabase() {
 	});
 
 	tweetInfoSchema.virtual('date.year').get(function() {
-		return this.date.getYears();
+		return this.date.getFullYear();
 	});
 
 	tweetInfoSchema.virtual('date.month').get(function() {
-		return this.date.getMonths();
+		return this.date.getMonth();
 	});
 
 	tweetInfoSchema.virtual('date.day').get(function() {
-		return this.date.getDays();
+		return this.date.getDate();
 	});
 
 	tweetInfoSchema.virtual('date.hour').get(function() {
@@ -98,7 +98,6 @@ function setupDatabase() {
 				this.max_id = timeline_obj.id;
 			}
 			else {
-				// do everything else. store it
 				// TODO: fix this line. add a tweetinfo object and call its load_info method
 				console.log("Storing Tweet of id: " + timeline_obj.id);
 				var t = new Tweet({});
@@ -187,9 +186,8 @@ app.get('/:user/update', function(req, res) {
 					if(err)
 						handleError(err, res);
 					else
-						updating_user = u;
 						console.log("User located in database.");
-						getTweets(updating_user, res);
+						getTweets(u, res);
 				});
 			}
 		}
