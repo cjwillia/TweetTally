@@ -127,16 +127,17 @@ db.once('open', setupDatabase);
 
 // helper function for user updating
 
-function getTweets(user, res) {
+function getTweets(user, res, c) {
 	console.log('Getting tweets for user ' + user.handle);
 	var done = false;
-	var obj = {screen_name:user.handle};
+	var o = {screen_name:user.handle};
 	if(typeof user !== "undefined") {
-		console.log("User is defined in the system, starting tweet collection.");
+		console.log("User is defined in the system, starting tweet collection...");
 		var counter = 0;
 		while(!done) {
-			client.get('statuses/user_timeline', obj, function(err, tweets, response) {
-				console.log("Client is polling for tweets.");
+			console.log("Client is preparing to poll for tweets...");
+			c.get('statuses/user_timeline', o, function(err, tweets, response) {
+				console.log("Client is polling for tweets...");
 				if(err)
 					console.log(err);
 				else {
@@ -178,7 +179,7 @@ app.get('/:user/update', function(req, res) {
 						handleError(error, res);
 					else {
 						console.log("User saved to database!");
-						getTweets(updating_user, res);
+						getTweets(updating_user, res, client);
 					}
 				});
 			}
@@ -188,7 +189,7 @@ app.get('/:user/update', function(req, res) {
 						handleError(error, res);
 					else {	
 						console.log("User located in database.");
-						getTweets(u, res);
+						getTweets(u, res, client);
 					}
 				});
 			}
