@@ -136,6 +136,7 @@ function getTweets(user, res) {
 		var counter = 0;
 		while(!done) {
 			client.get('statuses/user_timeline', obj, function(err, tweets, response) {
+				console.log("Client is polling for tweets.");
 				if(err)
 					console.log(err);
 				else {
@@ -149,11 +150,11 @@ function getTweets(user, res) {
 			console.log('No tweets added');
 		}
 		else {
-			updating_user.save(function(err) {
+			user.save(function(err) {
 				if(err)
 					console.log(err);
 				else
-					console.log('User Updated!')
+					console.log('User Updated!');
 			});
 		}
 	}
@@ -172,9 +173,9 @@ app.get('/:user/update', function(req, res) {
 			if(count === 0) {
 				console.log("Creating new user...");
 				var updating_user = new User({handle: obj.screen_name});
-				updating_user.save(function(err) {
-					if(err)
-						handleError(err, res);
+				updating_user.save(function(error) {
+					if(error)
+						handleError(error, res);
 					else {
 						console.log("User saved to database!");
 						getTweets(updating_user, res);
@@ -182,9 +183,9 @@ app.get('/:user/update', function(req, res) {
 				});
 			}
 			else {
-				User.findOne({'handle': obj.screen_name}, function(err, u) {
-					if(err)
-						handleError(err, res);
+				User.findOne({'handle': obj.screen_name}, function(error, u) {
+					if(error)
+						handleError(error, res);
 					else {	
 						console.log("User located in database.");
 						getTweets(u, res);
@@ -193,7 +194,6 @@ app.get('/:user/update', function(req, res) {
 			}
 		}
 	});
-	res.send("Update Page. This should redirect to the person's tweets.");
 });
 
 app.get('/:user/tweets', function(req, res) {
