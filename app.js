@@ -132,6 +132,7 @@ function getTweets(user, res) {
 	var done = false;
 	var obj = {screen_name:user.handle};
 	if(typeof user !== "undefined") {
+		console.log("User is defined in the system, starting tweet collection.");
 		var counter = 0;
 		while(!done) {
 			client.get('statuses/user_timeline', obj, function(err, tweets, response) {
@@ -163,7 +164,6 @@ function getTweets(user, res) {
 
 app.get('/:user/update', function(req, res) {
 	var obj = { screen_name:req.params.user };
-	var updating_user;
 	console.log("Finding users...");
 	User.count({'handle': obj.screen_name}, function(err, count) {
 		if(err)
@@ -171,7 +171,7 @@ app.get('/:user/update', function(req, res) {
 		else {
 			if(count === 0) {
 				console.log("Creating new user...");
-				updating_user = new User({handle: obj.screen_name});
+				var updating_user = new User({handle: obj.screen_name});
 				updating_user.save(function(err) {
 					if(err)
 						handleError(err, res);
@@ -185,9 +185,10 @@ app.get('/:user/update', function(req, res) {
 				User.findOne({'handle': obj.screen_name}, function(err, u) {
 					if(err)
 						handleError(err, res);
-					else
+					else {	
 						console.log("User located in database.");
 						getTweets(u, res);
+					}
 				});
 			}
 		}
