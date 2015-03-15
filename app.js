@@ -80,6 +80,7 @@ function setupDatabase() {
 		favorites_today: Number,
 		retweets_today: Number,
 		max_id: String,
+		since_id: String,
 		children: [tweetInfoSchema]
 	});
 
@@ -93,12 +94,11 @@ function setupDatabase() {
 			var today = new Date();
 
 			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
-				console.log("Found oldest tweet today"); // this one's temporary
+				console.log("Found oldest tweet today");
 				nextDayReached = true;
 				this.max_id = timeline_obj.id;
 			}
 			else {
-				// TODO: fix this line. add a tweetinfo object and call its load_info method
 				console.log("Storing Tweet of id: " + timeline_obj.id);
 				var t = new Tweet({});
 				t.load_info(timeline_obj);
@@ -127,37 +127,55 @@ db.once('open', setupDatabase);
 
 // helper function for user updating
 
-function getTweets(user, res, c) {
-	console.log('Getting tweets for user ' + user.handle);
-	var done = false;
-	var o = {screen_name:user.handle};
+function getTweets(user, res) {
 	if(typeof user !== "undefined") {
-		console.log("User is defined in the system, starting tweet collection...");
+		console.log('Getting tweets for user ' + user.handle + "...");
+		var o = { screen_name:user.handle, count: 100 };
 		var counter = 0;
-		while(!done) {
-			console.log("Client is preparing to poll for tweets...");
-			c.get('statuses/user_timeline', o, function(err, tweets, response) {
-				console.log("Client is polling for tweets...");
-				if(err)
-					console.log(err);
-				else {
-					counter += 1;
-					done = user.addTweets(tweets);
-					console.log("successfully found and added tweets. times: " + counter);
-				}
-			});		
+
+		if(typeof user.since_id !== "undefined")
+			o.since_id = user.since_id;
+		if(typeof user.max_id !== "undefined")
+			o.max_id = user.max_id;
+
+		// Because this process is recursive and requires a callback method,
+		// it is impossible to do with a simple while loop. Instead, I must write
+		// a recursive callback method
+
+		function tweetsHelper(b) {
+			if(b) {
+				user.save(function(err) {
+					if(err)
+						console.log(err);
+					else
+						console.log('User Updated!');
+				});
+				return true;
+			}
+			else {
+				o.max_id = user.max_id;
+				client.get('statuses/user_timeline', o, function(e, t, r) {
+					if (e)
+						console.log(e);
+					else {
+						counter += 1;
+						return tweetsHelper(user.addTweets(t));
+					}
+				});
+			}
 		}
-		if(counter === 0) {
-			console.log('No tweets added');
-		}
-		else {
-			user.save(function(err) {
-				if(err)
-					console.log(err);
-				else
-					console.log('User Updated!');
-			});
-		}
+
+		client.get('statuses/user_timeline', o, function(err, tweets, response) {
+			console.log("Client is polling for tweets...");
+			// set the since_id of the user object to the first tweet received
+			user.since_id = tweets[0].id;
+			if(err)
+				console.log(err);
+			else {
+				counter += 1;
+				tweetsHelper(user.addTweets(tweets));
+			}
+		});		
 	}
 	else {
 		console.log('ERROR: User was not found or added to the database.');
@@ -179,7 +197,7 @@ app.get('/:user/update', function(req, res) {
 						handleError(error, res);
 					else {
 						console.log("User saved to database!");
-						getTweets(updating_user, res, client);
+						getTweets(updating_user, res);
 					}
 				});
 			}
@@ -189,7 +207,7 @@ app.get('/:user/update', function(req, res) {
 						handleError(error, res);
 					else {	
 						console.log("User located in database.");
-						getTweets(u, res, client);
+						getTweets(u, res);
 					}
 				});
 			}
