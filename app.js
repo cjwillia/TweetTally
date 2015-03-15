@@ -143,7 +143,7 @@ function getTweets(user, res) {
 		// a recursive callback method
 
 		function tweetsHelper(b) {
-			if(b) {
+			if(!b) {
 				user.save(function(err) {
 					if(err)
 						console.log(err);
