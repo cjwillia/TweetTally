@@ -87,8 +87,26 @@ function setupDatabase() {
 	userSchema.methods.addTweets = function(timeline) {
 		var nextDayReached = false;
 		console.log('Adding tweets to user ' + this.handle);
-		for(var i = 0; i < timeline.length; i++) {
-			// pull tweets until previous day
+
+		function decrementTweetId(id_str) {
+			var result = id_str;
+			var i = result.length - 1;
+			while(i > -1) {
+				if(result[i] === "0") {
+					result = result.substring(0, i) + "9" + result.substring(i+1);
+					i--;
+				}
+				else {
+					result = result.substring(0, i) + (parseInt(result[i], 10) - 1).toString() + result.substring(i+1);
+					return result;
+				}
+			}
+			return result;
+		}
+
+		var i = 0;
+		while(i < timeline.length) {
+			// pull tweets until previous day is reached
 			var timeline_obj = timeline[i];
 			var d = new Date(timeline_obj.created_at);
 			var today = new Date();
@@ -96,19 +114,21 @@ function setupDatabase() {
 			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
 				console.log("Found oldest tweet today");
 				nextDayReached = true;
-				this.max_id = timeline_obj.id;
+				this.max_id = decrementTweetId(timeline_obj.id_str);
+				i += timeline.length;
 			}
 			else {
-				console.log("Storing Tweet of id: " + timeline_obj.id);
+				console.log("Storing Tweet of id: " + timeline_obj.id_str);
 				var t = new Tweet({});
 				t.load_info(timeline_obj);
 				this.children.push(t);
 				if(i === timeline.length - 1) {
 					// last index
 					if(!nextDayReached) {
-						this.max_id = timeline_obj.id;
+						this.max_id = decrementTweetId(timeline_obj.id_str);
 					}
 				}
+				i++;
 			}	
 		}
 		return nextDayReached;
@@ -125,7 +145,7 @@ var Tweet;
 var User;
 db.once('open', setupDatabase);
 
-// helper function for user updating
+// function for user updating
 
 function getTweets(user, res) {
 	if(typeof user !== "undefined") {
@@ -133,15 +153,7 @@ function getTweets(user, res) {
 		var o = { screen_name:user.handle, count: 100 };
 		var counter = 0;
 
-		if(typeof user.since_id !== "undefined")
-			o.since_id = user.since_id;
-		if(typeof user.max_id !== "undefined")
-			o.max_id = user.max_id;
-
-		// Because this process is recursive and requires a callback method,
-		// it is impossible to do with a simple while loop. Instead, I must write
-		// a recursive callback method
-
+		// helper method to recurse on client calls
 		function tweetsHelper(b) {
 			if(b) {
 				user.save(function(err) {
@@ -150,7 +162,7 @@ function getTweets(user, res) {
 					else
 						console.log('User Updated!');
 				});
-				res.send("User Updated! Good job, me.");
+				res.send("User Updated!");
 				return true;
 			}
 			else {
@@ -166,10 +178,14 @@ function getTweets(user, res) {
 			}
 		}
 
+		if(typeof user.since_id !== "undefined")
+			o.since_id = user.since_id;
+		if(typeof user.max_id !== "undefined")
+			o.max_id = user.max_id;
 		client.get('statuses/user_timeline', o, function(err, tweets, response) {
 			console.log("Client is polling for tweets...");
 			// set the since_id of the user object to the first tweet received
-			user.since_id = tweets[0].id;
+			user.since_id = tweets[0].id_str;
 			if(err)
 				console.log(err);
 			else {
