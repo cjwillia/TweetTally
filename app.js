@@ -242,12 +242,14 @@ app.get('/:user/tweets', function(req, res) {
 					if(err)
 						console.log(err);
 					else {
-						res.send("I found it! it's " + u.handle);
+						var response_obj = {tweets: u.children};
+						res.locals.data = response_obj;
+						res.sendFile("tweets.html");
 					}
 				});
 			}
 			else if(count === 0) {
-				res.send("Hey, this user doesn't exist in the system yet. Add them with the /update URL");
+				res.send("This user doesn't exist in the system yet. Add them with the /update URL");
 			}
 			else {
 				console.log('something has gone wrong here');
