@@ -2,7 +2,6 @@ var express = require('express');
 var app = express();
 var router = express.Router();
 var session = require('cookie-session');
-var path = require('path');
 
 app.set('port', (process.env.PORT || 5000));
 app.use(session({
@@ -245,8 +244,7 @@ app.get('/:user/tweets', function(req, res) {
 					else {
 						var response_obj = {tweets: u.children};
 						res.locals.data = response_obj;
-						res.sendFile('tweets.html', { root: path.join(__dirname, '../public') })
-					}
+						res.redirect('/tweets');
 				});
 			}
 			else if(count === 0) {
