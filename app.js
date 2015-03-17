@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var router = express.Router();
 var session = require('cookie-session');
+var path = require('path');
 
 app.set('port', (process.env.PORT || 5000));
 app.use(session({
