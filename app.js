@@ -244,7 +244,7 @@ app.get('/:user/tweets', function(req, res) {
 					else {
 						var response_obj = {tweets: u.children};
 						res.locals.data = response_obj;
-						res.sendFile("tweets.html");
+						//res.sendFile('tweets.html', { root: path.join(__dirname, '../public') })
 					}
 				});
 			}
