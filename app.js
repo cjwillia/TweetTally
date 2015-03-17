@@ -245,6 +245,7 @@ app.get('/:user/tweets', function(req, res) {
 						var response_obj = {tweets: u.children};
 						res.locals.data = response_obj;
 						res.redirect('/tweets');
+					}
 				});
 			}
 			else if(count === 0) {
