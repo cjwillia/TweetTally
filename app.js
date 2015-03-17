@@ -258,6 +258,10 @@ app.get('/:user/tweets', function(req, res) {
 	});
 });
 
+app.get('/tweets/:user', function(req, res) {
+	
+});
+
 app.get('/:user/favorites', function(req, res) {
 	var params = {screen_name:req.params.user};
 	// get the user's day timeline (userSchema.children)
