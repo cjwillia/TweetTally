@@ -10,6 +10,10 @@ app.use(session({
 
 app.use(express.static('public', {}));
 
+/////////////////////////
+// Twitter
+/////////////////////////
+
 var Twitter = require('twitter');
 
 var client = new Twitter({
@@ -19,17 +23,15 @@ var client = new Twitter({
 	access_token_secret: process.env.TWITTER_ACCESS_SECRET
 });
 
+///////////////////////
+// Database
+///////////////////////
+
 // is this necessary now with mongoose?
-var mongodb = require('mongodb');
+// var mongodb = require('mongodb');
 
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI);
-
-// helper to log errors and send info back to the client
-function handleError(err, res) {
-	console.log(err);
-	res.send("Sorry, there was an error in the server. Try navigating to the previous page.");
-}
 
 function setupDatabase() {
 
@@ -145,6 +147,13 @@ var Tweet;
 var User;
 db.once('open', setupDatabase);
 
+// helper to log errors and send info back to the client
+
+function handleError(err, res) {
+	console.log(err);
+	res.send("Sorry, there was an error in the server. Try navigating to the previous page.");
+}
+
 // function for user updating
 
 function getTweets(user, res) {
@@ -199,8 +208,13 @@ function getTweets(user, res) {
 	}
 }
 
-app.get('/:user/update', function(req, res) {
-	var obj = { screen_name:req.params.user };
+////////////////////
+// Routes
+////////////////////
+
+app.post('/tweets', function(req, res) {
+	// TODO: Make this happen on a post request 
+	var obj = { screen_name:req.query.user };
 	console.log("Finding users...");
 	User.count({'handle': obj.screen_name}, function(err, count) {
 		if(err)
@@ -232,34 +246,13 @@ app.get('/:user/update', function(req, res) {
 	});
 });
 
-app.get('/:user/tweets', function(req, res) {
-	User.count({'handle': req.params.user}, function(err, count) {
-		if(err)
-			console.log(err);
-		else {
-			if(count === 1) {
-				User.findOne({'handle': req.params.user}, function(err, u) {
-					if(err)
-						console.log(err);
-					else {
-						var response_obj = {tweets: u.children};
-						res.locals.data = response_obj;
-						res.redirect('/tweets');
-					}
-				});
-			}
-			else if(count === 0) {
-				res.send("This user doesn't exist in the system yet. Add them with the /update URL");
-			}
-			else {
-				console.log('something has gone wrong here');
-			}
-		}
-	});
-});
-
 app.get('/tweets/:user', function(req, res) {
-	
+	User.findOne({'handle': req.params.user}, function(err, u) {
+		if(err)
+			res.send(err);
+		else
+			res.send({tweets: u.children});
+	});
 });
 
 app.get('/:user/favorites', function(req, res) {

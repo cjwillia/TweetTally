@@ -1,4 +1,7 @@
-exports.setupDatabase(mongoose) {
+var express = require('express');
+var router = express.Router();
+
+function setupDatabase(mongoose) {
 
 	var tweetInfoSchema = mongoose.Schema({
 		date: Date,
@@ -87,3 +90,7 @@ exports.setupDatabase(mongoose) {
 	var User = mongoose.model('User', userSchema);
 	
 }
+
+router.use(function(req, res, next) {
+	
+});
