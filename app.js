@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
 var router = express.Router();
 var session = require('cookie-session');
 
@@ -9,6 +10,8 @@ app.use(session({
 }));
 
 app.use(express.static('public', {}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 /////////////////////////
 // Twitter
@@ -27,125 +30,14 @@ var client = new Twitter({
 // Database
 ///////////////////////
 
-// is this necessary now with mongoose?
-// var mongodb = require('mongodb');
-
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI);
-
-function setupDatabase() {
-
-	var tweetInfoSchema = mongoose.Schema({
-		date: Date,
-		tweet_id: String,
-		text: String,
-		favorites: Number,
-		retweets: Number
-	});
-
-	tweetInfoSchema.virtual('date.year').get(function() {
-		return this.date.getFullYear();
-	});
-
-	tweetInfoSchema.virtual('date.month').get(function() {
-		return this.date.getMonth();
-	});
-
-	tweetInfoSchema.virtual('date.day').get(function() {
-		return this.date.getDate();
-	});
-
-	tweetInfoSchema.virtual('date.hour').get(function() {
-		return this.date.getHours();
-	});
-
-	tweetInfoSchema.virtual('date.minute').get(function() {
-		return this.date.getMinutes();
-	});
-
-	tweetInfoSchema.virtual('date.second').get(function() {
-		return this.date.getSeconds();
-	});	
-
-	tweetInfoSchema.methods.load_info = function(tweet) {
-		var d = new Date(tweet.created_at);
-
-		this.favorites = tweet.favorite_count;
-		this.retweets = tweet.retweet_count;
-		this.text = tweet.text;
-		this.tweet_id = tweet.id_str;
-		this.date = d;
-	};
-
-	var userSchema = mongoose.Schema({
-		handle: String,
-		favorites_today: Number,
-		retweets_today: Number,
-		max_id: String,
-		since_id: String,
-		children: [tweetInfoSchema]
-	});
-
-	userSchema.methods.addTweets = function(timeline) {
-		var nextDayReached = false;
-		console.log('Adding tweets to user ' + this.handle);
-
-		function decrementTweetId(id_str) {
-			var result = id_str;
-			var i = result.length - 1;
-			while(i > -1) {
-				if(result[i] === "0") {
-					result = result.substring(0, i) + "9" + result.substring(i+1);
-					i--;
-				}
-				else {
-					result = result.substring(0, i) + (parseInt(result[i], 10) - 1).toString() + result.substring(i+1);
-					return result;
-				}
-			}
-			return result;
-		}
-
-		var i = 0;
-		while(i < timeline.length) {
-			// pull tweets until previous day is reached
-			var timeline_obj = timeline[i];
-			var d = new Date(timeline_obj.created_at);
-			var today = new Date();
-
-			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
-				console.log("Found oldest tweet today");
-				nextDayReached = true;
-				this.max_id = decrementTweetId(timeline_obj.id_str);
-				i += timeline.length;
-			}
-			else {
-				console.log("Storing Tweet of id: " + timeline_obj.id_str);
-				var t = new Tweet({});
-				t.load_info(timeline_obj);
-				this.children.push(t);
-				if(i === timeline.length - 1) {
-					// last index
-					if(!nextDayReached) {
-						this.max_id = decrementTweetId(timeline_obj.id_str);
-					}
-				}
-				i++;
-			}	
-		}
-		return nextDayReached;
-	}
-
-	Tweet = mongoose.model('Tweet', tweetInfoSchema);
-	User = mongoose.model('User', userSchema);
-	console.log('Tweets and Users are set up.');
-}
-
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-var Tweet;
-var User;
-db.once('open', setupDatabase);
+var models = require('./db.js')(mongoose);
+
+var Tweet = models.Tweet;
+var User = models.User;
 
 // helper to log errors and send info back to the client
 
@@ -171,7 +63,8 @@ function getTweets(user, res) {
 					else
 						console.log('User Updated!');
 				});
-				res.redirect('/updated/' + user.handle);
+				res.cookie('user', user.handle);
+				res.redirect('/updated.html');
 				return true;
 			}
 			else {
@@ -213,43 +106,44 @@ function getTweets(user, res) {
 ////////////////////
 
 app.post('/tweets', function(req, res) {
-	// TODO: Make this happen on a post request 
-	var obj = { screen_name:req.query.user };
-	console.log("Finding users...");
-	User.count({'handle': obj.screen_name}, function(err, count) {
-		if(err)
-			handleError(err, res);
-		else {
-			if(count === 0) {
-				console.log("Creating new user...");
-				var updating_user = new User({handle: obj.screen_name});
-				updating_user.save(function(error) {
-					if(error)
-						handleError(error, res);
-					else {
-						console.log("User saved to database!");
-						getTweets(updating_user, res);
-					}
-				});
-			}
+	if(typeof req.body.user === "undefined") {
+		res.send("No username received");
+	}
+	else {
+		var obj = { screen_name:req.body.user };
+		console.log("Finding users...");
+		User.count({'handle': obj.screen_name}, function(err, count) {
+			if(err)
+				handleError(err, res);
 			else {
-				User.findOne({'handle': obj.screen_name}, function(error, u) {
-					if(error)
-						handleError(error, res);
-					else {	
-						console.log("User located in database.");
-						getTweets(u, res);
-					}
-				});
+				if(count === 0) {
+					console.log("Creating new user...");
+					var updating_user = new User({handle: obj.screen_name});
+					updating_user.save(function(error) {
+						if(error)
+							handleError(error, res);
+						else {
+							console.log("User saved to database!");
+							getTweets(updating_user, res);
+						}
+					});
+				}
+				else {
+					User.findOne({'handle': obj.screen_name}, function(error, u) {
+						if(error)
+							handleError(error, res);
+						else {	
+							console.log("User located in database.");
+							getTweets(u, res);
+						}
+					});
+				}
 			}
-		}
-	});
+		});
+	}
 });
 
-app.get('/updated/:user', function(req, res) {
-	res.send('/updated.html');
-	setTimeout(function(){res.redirect('/tweets/' + req.params.user)}, 5000);
-});
+app.get('/updated')
 
 app.get('/tweets/:user', function(req, res) {
 	User.findOne({'handle': req.params.user}, function(err, u) {

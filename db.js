@@ -1,7 +1,4 @@
-var express = require('express');
-var router = express.Router();
-
-function setupDatabase(mongoose) {
+module.exports = function (mongoose) {
 
 	var tweetInfoSchema = mongoose.Schema({
 		date: Date,
@@ -12,15 +9,15 @@ function setupDatabase(mongoose) {
 	});
 
 	tweetInfoSchema.virtual('date.year').get(function() {
-		return this.date.getYears();
+		return this.date.getFullYear();
 	});
 
 	tweetInfoSchema.virtual('date.month').get(function() {
-		return this.date.getMonths();
+		return this.date.getMonth();
 	});
 
 	tweetInfoSchema.virtual('date.day').get(function() {
-		return this.date.getDays();
+		return this.date.getDate();
 	});
 
 	tweetInfoSchema.virtual('date.hour').get(function() {
@@ -50,47 +47,66 @@ function setupDatabase(mongoose) {
 		favorites_today: Number,
 		retweets_today: Number,
 		max_id: String,
+		since_id: String,
 		children: [tweetInfoSchema]
 	});
 
 	userSchema.methods.addTweets = function(timeline) {
 		var nextDayReached = false;
-		for(var i = 0; i < timeline.length; i++) {
-			// pull tweets until previous day
-			var tweet = timeline[i];
-			var d = new Date(tweet.created_at);
-			var today = new Date();
+		console.log('Adding tweets to user ' + this.handle);
 
-			if(d.getDays() < today.getDays()) {
-				nextDayReached = true;
-				this.max_id = tweet.id;
-			}
-			else {
-				// do everything else. store it
-				// TODO: fix this line. add a tweetinfo object and call its load_info method
-				var t = new Tweet({});
-				this.children.push()
-				if(i === timeline.length - 1) {
-					// last index
-					if(nextDayReached) {
-						return true;
-					}
-					else {
-						this.max_id = tweet.id;
-						return false;
-					}
+		function decrementTweetId(id_str) {
+			var result = id_str;
+			var i = result.length - 1;
+			while(i > -1) {
+				if(result[i] === "0") {
+					result = result.substring(0, i) + "9" + result.substring(i+1);
+					i--;
+				}
+				else {
+					result = result.substring(0, i) + (parseInt(result[i], 10) - 1).toString() + result.substring(i+1);
+					return result;
 				}
 			}
-
-			
+			return result;
 		}
+
+		var i = 0;
+		while(i < timeline.length) {
+			// pull tweets until previous day is reached
+			var timeline_obj = timeline[i];
+			var d = new Date(timeline_obj.created_at);
+			var today = new Date();
+
+			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
+				console.log("Found oldest tweet today");
+				nextDayReached = true;
+				this.max_id = decrementTweetId(timeline_obj.id_str);
+				i += timeline.length;
+			}
+			else {
+				console.log("Storing Tweet of id: " + timeline_obj.id_str);
+				var t = new Tweet({});
+				t.load_info(timeline_obj);
+				this.children.push(t);
+				if(i === timeline.length - 1) {
+					// last index
+					if(!nextDayReached) {
+						this.max_id = decrementTweetId(timeline_obj.id_str);
+					}
+				}
+				i++;
+			}	
+		}
+		return nextDayReached;
 	}
 
 	var Tweet = mongoose.model('Tweet', tweetInfoSchema);
 	var User = mongoose.model('User', userSchema);
-	
+	var models = {
+		'Tweet': Tweet,
+		'User' : User
+	}
+	console.log('Tweets and Users are set up.');
+	return models;
 }
-
-router.use(function(req, res, next) {
-	
-});
