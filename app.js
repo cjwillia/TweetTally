@@ -171,7 +171,7 @@ function getTweets(user, res) {
 					else
 						console.log('User Updated!');
 				});
-				res.send("User Updated!");
+				res.redirect('/updated/' + user.handle);
 				return true;
 			}
 			else {
@@ -244,6 +244,11 @@ app.post('/tweets', function(req, res) {
 			}
 		}
 	});
+});
+
+app.get('/updated/:user', function(req, res) {
+	res.send('/updated.html');
+	setTimeout(function(){res.redirect('/tweets/' + req.params.user)}, 5000);
 });
 
 app.get('/tweets/:user', function(req, res) {
