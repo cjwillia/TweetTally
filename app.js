@@ -34,17 +34,10 @@ var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-var models = require('./db.js')(mongoose);
 
+var models = require('./db.js')(mongoose);
 var Tweet = models.Tweet;
 var User = models.User;
-
-// helper to log errors and send info back to the client
-
-function handleError(err, res) {
-	console.log(err);
-	res.send("Sorry, there was an error in the server. Try navigating to the previous page.");
-}
 
 ////////////////////
 // Routes

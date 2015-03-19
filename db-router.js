@@ -4,6 +4,13 @@ module.exports = function(models, client) {
 	var Tweet = models.Tweet;
 	var User = models.User;
 
+	// helper to log errors and send info back to the client
+
+	function handleError(err, res) {
+		console.log(err);
+		res.send("Sorry, there was an error in the server. Try navigating to the previous page.");
+	}
+
 	// function for user updating
 
 	function getTweets(user, res) {
@@ -105,7 +112,7 @@ module.exports = function(models, client) {
 				res.send({tweets: u.children});
 		});
 	});
-	
+
 	return router;
 }
 

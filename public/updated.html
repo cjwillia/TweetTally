@@ -1,2 +1,14 @@
-<h3>User has been successfully updated!</h3>
-<p>Redirecting to user...</p>
+<head>
+	<link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css">
+</head>
+
+<body>
+	<h3>User has been successfully updated!</h3>
+	<p>Redirecting to user...</p>
+	<script type="text/javascript">
+		setTimeout(function() {
+			window.location = "/tweets/" + document.cookie.user;
+		}, 5000);
+	</script>
+	<script type="text/javascript" href="/bootstrap/js/bootstrap.min.js"></script>
+</body>
