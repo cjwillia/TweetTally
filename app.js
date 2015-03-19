@@ -106,11 +106,11 @@ function getTweets(user, res) {
 ////////////////////
 
 app.post('/tweets', function(req, res) {
-	if(typeof req.body.user === "undefined") {
+	if(typeof req.body.handle === "undefined") {
 		res.send("No username received");
 	}
 	else {
-		var obj = { screen_name:req.body.user };
+		var obj = { screen_name:req.body.handle };
 		console.log("Finding users...");
 		User.count({'handle': obj.screen_name}, function(err, count) {
 			if(err)
@@ -143,7 +143,7 @@ app.post('/tweets', function(req, res) {
 	}
 });
 
-app.get('/updated')
+app.get('/updated');
 
 app.get('/tweets/:user', function(req, res) {
 	User.findOne({'handle': req.params.user}, function(err, u) {
