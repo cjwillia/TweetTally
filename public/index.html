@@ -3,9 +3,31 @@
 </head>
 
 <body>
+	<div class="row">
+		<div class="col-sm-12">
+			<h2>Welcome to Tweet Tally!</h2>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-12">
+			<p><i>Enter a twitter handle to get started...</i></p>
+		</div>
+	</div>
+
+	<br />
+
 	<form action="/tweets" method="POST">
-		<input name="handle" type="text">
-		<input type="Submit" value="Collect Tweets">
+		<div class="row">
+			<div class="col-sm-4 col-sm-offset-4">
+				<input name="handle" type="text">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-4 col-sm-offset-4">
+				<input type="Submit" value="Collect Tweets">
+			</div>
+		</div>
 	</form>	
 	<script type="text/javascript" src="/js/jquery-1.11.2.min.js"></script>
 	<script type="text/javascript" src="/bootstrap-3.3.4-dist/js/bootstrap.js"></script>
