@@ -50,12 +50,11 @@ module.exports = function(models, client) {
 			if(typeof user.max_id !== "undefined")
 				o.max_id = user.max_id;
 			client.get('statuses/user_timeline', o, function(err, tweets, response) {
-				console.log("Client is polling for tweets...");
 				// set the since_id of the user object to the first tweet received
-				user.since_id = tweets[0].id_str;
 				if(err)
 					console.log(err);
 				else {
+					user.since_id = tweets[0].id_str;
 					counter += 1;
 					tweetsHelper(user.addTweets(tweets));
 				}
