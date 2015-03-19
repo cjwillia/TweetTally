@@ -50,6 +50,9 @@ function handleError(err, res) {
 // Routes
 ////////////////////
 
+var tweets = require('./db-router.js')(models, client);
+
+app.use('/tweets', tweets);
 
 app.get('/:user/favorites', function(req, res) {
 	var params = {screen_name:req.params.user};

@@ -105,6 +105,8 @@ module.exports = function(models, client) {
 				res.send({tweets: u.children});
 		});
 	});
+	
+	return router;
 }
 
 
