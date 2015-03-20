@@ -11,15 +11,12 @@ function getCookie(cname) {
 }
 
 
-function getDBTweets(user, cb) {
-	var req = $.getJSON({
-		url: '/' + user,
-		success: cb
-	});
+function getDBTweets(cb) {
+	$.getJSON('/tweets/' + getCookie('user'), cb);
 }
 
 function graphTweets(data) {
-	alert(data[0].date.year);
+	alert(data.tweets[0].date.year);
 }
 
-getDBTweets(getCookie('user'), graphTweets);
+getDBTweets(graphTweets);
