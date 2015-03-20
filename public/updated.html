@@ -6,8 +6,19 @@
 	<h3>User has been successfully updated!</h3>
 	<p>Redirecting to user...</p>
 	<script type="text/javascript">
+		// cookie parsing function taken from W3 Schools http://www.w3schools.com/js/js_cookies.asp
+		function getCookie(cname) {
+		    var name = cname + "=";
+		    var ca = document.cookie.split(';');
+		    for(var i=0; i<ca.length; i++) {
+		        var c = ca[i];
+		        while (c.charAt(0)==' ') c = c.substring(1);
+		        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+		    }
+		    return "";
+		}
 		setTimeout(function() {
-			window.location = "/tweets/" + document.cookie.user;
+			window.location = "/tweets/" + getCookie('user');
 		}, 5000);
 	</script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
