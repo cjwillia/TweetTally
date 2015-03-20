@@ -43,20 +43,11 @@ var User = models.User;
 // Routes
 ////////////////////
 
-var tweets = require('./db-router.js')(models, client);
+var tweets = require('./tweets-router.js')(models, client);
+var graph = require('./graph-router.js')(models);
 
 app.use('/tweets', tweets);
-
-app.get('/:user/favorites', function(req, res) {
-	var params = {screen_name:req.params.user};
-	// get the user's day timeline (userSchema.children)
-	// for each tweet with favorites, take down the time and number of favorites
-	// send back an object with that information on it
-});
-
-app.get('/extra', function(req, res) {
-	
-});
+app.use('/graph', graph);
 
 app.listen(app.get('port'), function() {
 	console.log("Node app is running locally on port: " + app.get('port'));
