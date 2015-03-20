@@ -112,7 +112,10 @@ module.exports = function(models, client) {
 			if(err)
 				console.log(err)
 			else {
-				u = u.toObject();
+				u = u.toJSON();
+				u.children.forEach(function(child) {
+					child = child.toJSON();
+				});
 				res.send({tweets: u.children});
 			}
 		});

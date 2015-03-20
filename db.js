@@ -35,7 +35,7 @@ module.exports = function (mongoose) {
 
 	tweetInfoSchema.virtual('date.second').get(function() {
 		return this.date.getSeconds();
-	});	
+	});
 
 	tweetInfoSchema.methods.load_info = function(tweet) {
 		var d = new Date(tweet.created_at);
