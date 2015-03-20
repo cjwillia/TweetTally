@@ -3,7 +3,7 @@ module.exports = function(models) {
 	var router = express.Router();
 
 	router.get('/:user', function(req, res) {
-		res.redirect('/graph.html')
+		res.redirect('/graph.html');
 	});
 
 	router.get('/:user/favorites', function(req, res) {
