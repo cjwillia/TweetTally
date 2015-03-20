@@ -82,7 +82,6 @@ module.exports = function (mongoose) {
 			var timeline_obj = timeline[i];
 			var d = new Date(timeline_obj.created_at);
 			var today = new Date();
-			console.log(timeline_obj.retweeted_status); // remove
 
 			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
 				console.log("Found oldest tweet today");
@@ -90,7 +89,7 @@ module.exports = function (mongoose) {
 				this.max_id = decrementTweetId(timeline_obj.id_str);
 				i += timeline.length;
 			}
-			else if(typeof timeline_obj.retweeted_status.id !== undefined) {
+			else if(typeof timeline_obj.retweeted_status !== undefined) {
 				console.log("Retweet Found");
 				// anything else here is out of scope right now.
 				i++;
