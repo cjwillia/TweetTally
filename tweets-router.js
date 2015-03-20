@@ -112,10 +112,7 @@ module.exports = function(models, client) {
 			if(err)
 				console.log(err)
 			else {
-				u = u.toJSON();
-				u.children.forEach(function(child) {
-					child = child.toJSON();
-				});
+				console.log(u.children[0].date.year);
 				res.send({tweets: u.children});
 			}
 		});
