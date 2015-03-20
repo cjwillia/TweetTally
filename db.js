@@ -6,7 +6,12 @@ module.exports = function (mongoose) {
 		text: String,
 		favorites: Number,
 		retweets: Number
+	},
+	{
+		toObject: { virtuals: true },
+		toJSON: { virtuals: true }
 	});
+
 
 	tweetInfoSchema.virtual('date.year').get(function() {
 		return this.date.getFullYear();
@@ -77,12 +82,18 @@ module.exports = function (mongoose) {
 			var timeline_obj = timeline[i];
 			var d = new Date(timeline_obj.created_at);
 			var today = new Date();
+			console.log(timeline_obj.retweeted_status); // remove
 
 			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
 				console.log("Found oldest tweet today");
 				nextDayReached = true;
 				this.max_id = decrementTweetId(timeline_obj.id_str);
 				i += timeline.length;
+			}
+			else if(typeof timeline_obj.retweeted_status.id !== undefined) {
+				console.log("Retweet Found");
+				// anything else here is out of scope right now.
+				i++;
 			}
 			else {
 				console.log("Storing Tweet of id: " + timeline_obj.id_str);
@@ -91,9 +102,7 @@ module.exports = function (mongoose) {
 				this.children.push(t);
 				if(i === timeline.length - 1) {
 					// last index
-					if(!nextDayReached) {
-						this.max_id = decrementTweetId(timeline_obj.id_str);
-					}
+					this.max_id = decrementTweetId(timeline_obj.id_str);
 				}
 				i++;
 			}	
