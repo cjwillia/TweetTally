@@ -89,7 +89,7 @@ module.exports = function (mongoose) {
 				this.max_id = decrementTweetId(timeline_obj.id_str);
 				i += timeline.length;
 			}
-			else if(typeof timeline_obj.retweeted_status !== undefined) {
+			else if(typeof timeline_obj.retweeted_status !== 'undefined') {
 				console.log("Retweet Found");
 				// anything else here is out of scope right now.
 				i++;
