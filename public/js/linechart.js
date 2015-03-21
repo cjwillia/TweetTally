@@ -1,31 +1,36 @@
 function drawChart() {
 
-    // Create the data table.
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Hour');
-    data.addColumn('number', 'Tweets');
-
-    var rows = [];
-    var i = 0;
-    while(i < 24) {
-        rows.push(["0" + i.toString() + ":00", 0]);
-        i++;
+    if(!loaded) {
+        drawChart();
     }
+    else {
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Hour');
+        data.addColumn('number', 'Tweets');
 
-    tweets.forEach(function(tweet) {
-        rows[tweet.hour][1]++;
-    });
+        var rows = [];
+        var i = 0;
+        while(i < 24) {
+            rows.push([i.toString() + ":00", 0]);
+            i++;
+        }
 
-    data.addRows(rows);
+        tweets.forEach(function(tweet) {
+            rows[tweet.hour][1]++;
+        });
 
-    // Set chart options
-    var options = {'title':'Tweets per Hour',
-    'width':400,
-    'height':300};
+        data.addRows(rows);
 
-    // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-    chart.draw(data, options);
+        // Set chart options
+        var options = {'title':'Tweets per Hour',
+        'width':400,
+        'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
 }
 
 // Load the Visualization API and the piechart package.

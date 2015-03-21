@@ -1,5 +1,5 @@
 var tweets = {};
-
+var loaded = false;
 // cookie parsing function taken from W3 Schools http://www.w3schools.com/js/js_cookies.asp
 function getCookie(cname) {
     var name = cname + "=";
@@ -24,7 +24,7 @@ function loadTweets(data) {
         tweet.hour = tweet.date.getHours();
     });
     tweets = t;
-
+    loaded = true;
 }
 
 getDBTweets(loadTweets);
