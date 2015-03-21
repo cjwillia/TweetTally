@@ -19,10 +19,14 @@ function getDBTweets(cb) {
 
 function loadTweets(data) {
     var t = data.tweets;
-    
-    // t.forEach(function(tweet) {
-    //     tweet.hour = tweet.date.getHours();
-    // });
+
+    t.forEach(function(tweet) {
+        tweet.date = new Date(tweet.date);
+        tweet.hour = tweet.date.getHours();
+    });
+    t.dateGraphData = function() {
+
+    }
     tweets = t;
 }
 
@@ -43,24 +47,30 @@ google.setOnLoadCallback(drawChart);
 // draws it.
 function drawChart() {
 
-// Create the data table.
-var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Topping');
-    data.addColumn('number', 'Slices');
-    data.addRows([
-    ['Mushrooms', 3],
-    ['Onions', 1],
-    ['Olives', 1],
-    ['Zucchini', 1],
-    ['Pepperoni', 2]
-    ]);
+    // Create the data table.
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Hour');
+    data.addColumn('number', 'Tweets');
+
+    var rows = [];
+    var i = 0;
+    while(i < 24) {
+        rows.push(["0" + i.toString() + ":00", 0]);
+        i++;
+    }
+
+    tweets.forEach(function(tweet) {
+        rows[tweet.hour][1]++;
+    });
+
+    data.addRows(rows);
 
     // Set chart options
-    var options = {'title':'How Much Pizza I Ate Last Night',
+    var options = {'title':'Tweets per Hour',
     'width':400,
     'height':300};
 
     // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
     chart.draw(data, options);
 }
