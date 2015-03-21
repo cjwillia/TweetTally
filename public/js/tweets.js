@@ -19,9 +19,10 @@ function getDBTweets(cb) {
 
 function loadTweets(data) {
     var t = data.tweets;
-    t.forEach(function(tweet) {
-        tweet.hour = tweet.date.getHours();
-    });
+    
+    // t.forEach(function(tweet) {
+    //     tweet.hour = tweet.date.getHours();
+    // });
     tweets = t;
 }
 
