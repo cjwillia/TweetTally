@@ -12,31 +12,6 @@ module.exports = function (mongoose) {
 		toJSON: { virtuals: true }
 	});
 
-
-	tweetInfoSchema.virtual('date.year').get(function() {
-		return this.date.getFullYear();
-	});
-
-	tweetInfoSchema.virtual('date.month').get(function() {
-		return this.date.getMonth();
-	});
-
-	tweetInfoSchema.virtual('date.day').get(function() {
-		return this.date.getDate();
-	});
-
-	tweetInfoSchema.virtual('date.hour').get(function() {
-		return this.date.getHours();
-	});
-
-	tweetInfoSchema.virtual('date.minute').get(function() {
-		return this.date.getMinutes();
-	});
-
-	tweetInfoSchema.virtual('date.second').get(function() {
-		return this.date.getSeconds();
-	});
-
 	tweetInfoSchema.methods.load_info = function(tweet) {
 		var d = new Date(tweet.created_at);
 

@@ -111,10 +111,8 @@ module.exports = function(models, client) {
 		User.findOne({ handle: req.params.user }, function(err, u) {
 			if(err)
 				console.log(err)
-			else {
-				console.log(u.children[0].date.year);
+			else 
 				res.send({tweets: u.children});
-			}
 		});
 	});
 
