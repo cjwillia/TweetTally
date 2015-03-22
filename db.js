@@ -58,6 +58,9 @@ module.exports = function (mongoose) {
 			var d = new Date(timeline_obj.created_at);
 			var today = new Date();
 
+			console.log(today);
+			console.log(today.getDate());
+
 			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
 				console.log("Found oldest tweet today");
 				nextDayReached = true;
