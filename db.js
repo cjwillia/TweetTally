@@ -55,14 +55,17 @@ module.exports = function (mongoose) {
 		while(i < timeline.length) {
 			// pull tweets until previous day is reached
 			var timeline_obj = timeline[i];
-			var d = new Date(timeline_obj.created_at);
-			var today = new Date();
 
-			console.log(today);
+			// this is hard-coded to be east coast time
+			var fourHours = 4 * 1000 * 60 * 60
+			var d = new Date(Date.parse(timeline_obj.created_at) - (fourHours));
+			var today = new Date(Date.now() - (fourHours));
+
 			console.log(today.getDate());
+			console.log(d.getDate());
 
 			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
-				console.log("Found oldest tweet today");
+				console.log("Found tweet from different day");
 				nextDayReached = true;
 				this.max_id = decrementTweetId(timeline_obj.id_str);
 				i += timeline.length;
