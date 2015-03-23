@@ -3,6 +3,7 @@ module.exports = function(models, client) {
 	var router = express.Router();
 	var Tweet = models.Tweet;
 	var User = models.User;
+	var util = require('./util.js');
 
 	// helper to log errors and send info back to the client
 
@@ -15,6 +16,15 @@ module.exports = function(models, client) {
 
 	function getTweets(user, res) {
 		if(typeof user !== "undefined") {
+			var top = user.children[0];
+			if(top) {
+				var est = -4;
+				var d1 = util.dateShift(top.date, est);
+				var d2 = util.dateShift(new Date(), est);
+				if(util.dateCompare(d1, d2) !== 0) {
+					user.removeTweets();
+				}
+			}
 			console.log('Getting tweets for user ' + user.handle + "...");
 			var o = { screen_name:user.handle, count: 100 };
 			var counter = 0;
@@ -25,11 +35,12 @@ module.exports = function(models, client) {
 					user.save(function(err) {
 						if(err)
 							console.log(err);
-						else
+						else {
 							console.log('User Updated!');
+							res.cookie('user', user.handle);
+							res.redirect('/updated.html');
+						}
 					});
-					res.cookie('user', user.handle);
-					res.redirect('/updated.html');
 					return true;
 				}
 				else {
@@ -49,6 +60,7 @@ module.exports = function(models, client) {
 				o.since_id = user.since_id;
 			if(typeof user.max_id !== "undefined")
 				o.max_id = user.max_id;
+
 			client.get('statuses/user_timeline', o, function(err, tweets, response) {
 				if(err)
 					console.log(err);

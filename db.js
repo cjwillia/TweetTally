@@ -61,8 +61,6 @@ module.exports = function (mongoose) {
 			var d = new Date(Date.parse(timeline_obj.created_at) - (fourHours));
 			var today = new Date(Date.now() - (fourHours));
 
-			console.log(today.getDate());
-			console.log(d.getDate());
 
 			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
 				console.log("Found tweet from different day");
@@ -88,6 +86,17 @@ module.exports = function (mongoose) {
 			}	
 		}
 		return nextDayReached;
+	}
+
+	userSchema.methods.removeTweets = function() {
+		this.children.toObject().forEach(function(t) {
+			t.remove(function(err, t) {
+				if (err)
+					console.log(err);
+				else
+					console.log("Tweet removed");
+			});
+		});
 	}
 
 	var Tweet = mongoose.model('Tweet', tweetInfoSchema);
