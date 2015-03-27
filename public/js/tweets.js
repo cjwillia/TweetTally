@@ -11,10 +11,6 @@ function getCookie(cname) {
     return "";
 }
 
-function getDBTweets(cb) {
-	$.getJSON('/tweets/' + getCookie('user'), cb);
-}
-
 function loadTweets(data) {
     var t = data.tweets;
 
@@ -23,7 +19,9 @@ function loadTweets(data) {
         tweet.hour = tweet.date.getHours();
     });
     tweets = t;
-    loaded = true;
+    drawChart();
 }
 
-getDBTweets(loadTweets);
+function getDBTweets() {
+	$.getJSON('/tweets/' + getCookie('user'), loadTweets);
+}

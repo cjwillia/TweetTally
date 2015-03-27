@@ -1,9 +1,9 @@
+var express = require('express');
+var router = express.Router();
+var util = require('./util.js');
 module.exports = function(models, client) {
-	var express = require('express');
-	var router = express.Router();
 	var Tweet = models.Tweet;
 	var User = models.User;
-	var util = require('./util.js');
 
 	// helper to log errors and send info back to the client
 
@@ -23,10 +23,12 @@ module.exports = function(models, client) {
 				var d2 = util.dateShift(new Date(), est);
 				if(util.dateCompare(d1, d2) !== 0) {
 					user.removeTweets();
+					user.since_id = undefined;
 				}
 			}
+
 			console.log('Getting tweets for user ' + user.handle + "...");
-			var o = { screen_name:user.handle, count: 100 };
+			var client_params = { screen_name:user.handle, count: 100 };
 			var counter = 0;
 
 			// helper method to recurse on client calls
@@ -44,8 +46,8 @@ module.exports = function(models, client) {
 					return true;
 				}
 				else {
-					o.max_id = user.max_id;
-					client.get('statuses/user_timeline', o, function(e, t, r) {
+					client_params.max_id = user.max_id;
+					client.get('statuses/user_timeline', client_params, function(e, t, r) {
 						if (e)
 							console.log(e);
 						else {
@@ -57,11 +59,11 @@ module.exports = function(models, client) {
 			}
 
 			if(typeof user.since_id !== "undefined")
-				o.since_id = user.since_id;
+				client_params.since_id = user.since_id;
 			if(typeof user.max_id !== "undefined")
-				o.max_id = user.max_id;
+				client_params.max_id = user.max_id;
 
-			client.get('statuses/user_timeline', o, function(err, tweets, response) {
+			client.get('statuses/user_timeline', client_params, function(err, tweets, response) {
 				if(err)
 					console.log(err);
 				else if(tweets.length === 0) {

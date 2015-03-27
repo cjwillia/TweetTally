@@ -1,3 +1,5 @@
+var util = require('./util.js');
+
 module.exports = function (mongoose) {
 
 	var tweetInfoSchema = mongoose.Schema({
@@ -57,6 +59,7 @@ module.exports = function (mongoose) {
 			var timeline_obj = timeline[i];
 
 			// this is hard-coded to be east coast time
+			var
 			var fourHours = 4 * 1000 * 60 * 60
 			var d = new Date(Date.parse(timeline_obj.created_at) - (fourHours));
 			var today = new Date(Date.now() - (fourHours));
