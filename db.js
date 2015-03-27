@@ -34,8 +34,6 @@ module.exports = function (mongoose) {
 	});
 
 	userSchema.methods.addTweets = function(timeline) {
-		var nextDayReached = false;
-		console.log('Adding tweets to user ' + this.handle);
 
 		function decrementTweetId(id_str) {
 			var result = id_str;
@@ -53,17 +51,18 @@ module.exports = function (mongoose) {
 			return result;
 		}
 
+		var nextDayReached = false;
 		var i = 0;
+		console.log('Adding tweets to user ' + this.handle);
+		
 		while(i < timeline.length) {
 			// pull tweets until previous day is reached
 			var timeline_obj = timeline[i];
 
 			// this is hard-coded to be east coast time
-			var
-			var fourHours = 4 * 1000 * 60 * 60
+			var fourHours = 4 * 1000 * 60 * 60;
 			var d = new Date(Date.parse(timeline_obj.created_at) - (fourHours));
 			var today = new Date(Date.now() - (fourHours));
-
 
 			if(d.getDate() !== today.getDate() || d.getMonth() !== today.getMonth() || d.getFullYear() !== today.getFullYear()) {
 				console.log("Found tweet from different day");
