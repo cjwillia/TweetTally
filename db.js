@@ -91,14 +91,16 @@ module.exports = function (mongoose) {
 	}
 
 	userSchema.methods.removeTweets = function() {
-		this.children.toObject().forEach(function(t) {
-			t.remove(function(err, t) {
-				if (err)
+		var i = this.children.length;
+		while(i--) {
+			var tweet = this.children[i];
+			tweet.remove(function(err, t){
+				if(err)
 					console.log(err);
 				else
-					console.log("Tweet removed");
+					console.log("Tweet removed!");
 			});
-		});
+		}
 	}
 
 	var Tweet = mongoose.model('Tweet', tweetInfoSchema);
