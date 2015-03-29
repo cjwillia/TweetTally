@@ -3,6 +3,7 @@ var router = express.Router();
 
 module.exports = function(models, client) {
 	var Stream = models.stream;
+	var active_stream;
 
 	router.post('/', function(req, res) {
 
@@ -20,6 +21,7 @@ module.exports = function(models, client) {
 					console.log(err);
 				});
 				console.log("Client is streaming tweets");
+				return s;
 			});
 		}
 
@@ -32,8 +34,10 @@ module.exports = function(models, client) {
 					stream.save(function(err) {
 						if(err)
 							console.log(err);
-						else
-							twitterStream(stream);
+						else {
+							active_stream = twitterStream(stream);
+							res.send("Stream open (new user!)");
+						}
 					});
 				}
 				else {
@@ -41,7 +45,8 @@ module.exports = function(models, client) {
 						if(err)
 							console.log(err);
 						else {
-							twitterStream(s);
+							active_stream = twitterStream(s);
+							res.send("Stream open");
 						}
 					});
 				}
