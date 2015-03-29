@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 module.exports = function(models, client) {
-	var Stream = models.stream;
+	var Stream = models.Stream;
 
 	router.post('/', function(req, res) {
 
