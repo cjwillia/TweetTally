@@ -4,6 +4,7 @@ var util = require('./util.js');
 module.exports = function(models, client) {
 	var Tweet = models.Tweet;
 	var User = models.User;
+	var Stream = models.Stream;
 
 	// helper to log errors and send info back to the client
 
@@ -127,6 +128,40 @@ module.exports = function(models, client) {
 				console.log(err)
 			else 
 				res.send({tweets: u.children});
+		});
+	});
+
+	router.post('/stream', function(req, res) {
+		Stream.findOne({ term: req.query.term }, function(err, s) {
+			if(err)
+				console.log(err);
+			else {
+				client.stream('statuses/filter', {track: req.query.term}, function(stream) {
+					stream.on('data', function(tweet) {
+						s.total++;
+						s.save(function(err) {
+							if(err)
+								console.log(err);
+						});
+					});
+
+					stream.on('error', function(err) {
+						console.log(err);
+					});
+					res.send("Client is streaming tweets");
+				});
+			}
+		});
+	});
+
+	router.get('/stream/:term', function(req, res) {
+		Stream.findOne({term: req.params.term}, function(err, s) {
+			if(err)
+				console.log(err);
+			else {
+				var res_obj = {n: s.total};
+				res.send(res_obj);
+			}
 		});
 	});
 

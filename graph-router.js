@@ -14,5 +14,10 @@ module.exports = function(models) {
 
 	});
 
+	router.get('/:term/stream', function(req, res) {
+		res.cookie('term', req.params.term);
+		res.redirect('/stream.html');
+	});
+
 	return router;
 }

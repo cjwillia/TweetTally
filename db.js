@@ -2,6 +2,11 @@ var util = require('./util.js');
 
 module.exports = function (mongoose) {
 
+	var streamSchema = mongoose.Schema({
+		term: String,
+		total: Number
+	});
+
 	var tweetInfoSchema = mongoose.Schema({
 		date: Date,
 		tweet_id: String,
@@ -105,9 +110,11 @@ module.exports = function (mongoose) {
 
 	var Tweet = mongoose.model('Tweet', tweetInfoSchema);
 	var User = mongoose.model('User', userSchema);
+	var Stream = mongoose.model('Stream', streamSchema);
 	var models = {
-		'Tweet': Tweet,
-		'User' : User
+		'Tweet' : Tweet,
+		'User'  : User,
+		'Stream': Stream
 	}
 	console.log('Tweets and Users are set up.');
 	return models;
