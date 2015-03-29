@@ -45,7 +45,7 @@ var User = models.User;
 
 var tweets = require('./tweets-router.js')(models, client);
 var graph = require('./graph-router.js')(models);
-var stream = require('./stream-router.js')
+var stream = require('./stream-router.js')(models, client);
 
 app.use('/tweets', tweets);
 app.use('/graph', graph);
