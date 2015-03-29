@@ -132,7 +132,7 @@ module.exports = function(models, client) {
 	});
 
 	router.post('/stream', function(req, res) {
-		
+
 		function twitterStream(stream) {
 			client.stream('statuses/filter', { track: stream.term }, function(s) {
 				s.on('data', function(tweet) {
@@ -156,7 +156,12 @@ module.exports = function(models, client) {
 			else {
 				if(count === 0) {
 					var stream = new Stream({term: req.query.term, total: 0});
-					twitterStream(stream);
+					stream.save(function(err) {
+						if(err)
+							console.log(err);
+						else
+							twitterStream(stream);
+					});
 				}
 				else {
 					Stream.findOne({ term: req.query.term }, function(err, s) {
