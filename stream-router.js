@@ -3,25 +3,24 @@ var router = express.Router();
 
 module.exports = function(models, client) {
 	var Stream = models.stream;
-	var active_stream;
 
 	router.post('/', function(req, res) {
 
-		function twitterStream(stream) {
+		function twitterStream(stream, res) {
 			client.stream('statuses/filter', { track: stream.term }, function(s) {
 				s.on('data', function(tweet) {
 					stream.total++;
 					stream.save(function(err) {
 						if(err)
 							console.log(err);
-					})
+					});
 				});
 
 				s.on('error', function(err) {
 					console.log(err);
 				});
 				console.log("Client is streaming tweets");
-				return s;
+				res.send("Stream is open");
 			});
 		}
 
@@ -35,8 +34,7 @@ module.exports = function(models, client) {
 						if(err)
 							console.log(err);
 						else {
-							active_stream = twitterStream(stream);
-							res.send("Stream open (new user!)");
+							twitterStream(stream, res);
 						}
 					});
 				}
@@ -45,8 +43,7 @@ module.exports = function(models, client) {
 						if(err)
 							console.log(err);
 						else {
-							active_stream = twitterStream(s);
-							res.send("Stream open");
+							twitterStream(s, res);
 						}
 					});
 				}
