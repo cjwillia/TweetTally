@@ -132,26 +132,44 @@ module.exports = function(models, client) {
 	});
 
 	router.post('/stream', function(req, res) {
-		Stream.findOne({ term: req.query.term }, function(err, s) {
+		
+		function twitterStream(stream) {
+			client.stream('statuses/filter', { track: stream.term }, function(s) {
+				s.on('data', function(tweet) {
+					stream.total++;
+					stream.save(function(err) {
+						if(err)
+							console.log(err);
+					})
+				});
+
+				s.on('error', function(err) {
+					console.log(err);
+				});
+				console.log("Client is streaming tweets");
+			});
+		}
+
+		Stream.count({term: req.query.term}, function(err, count) {
 			if(err)
 				console.log(err);
 			else {
-				client.stream('statuses/filter', {track: req.query.term}, function(stream) {
-					stream.on('data', function(tweet) {
-						s.total++;
-						s.save(function(err) {
-							if(err)
-								console.log(err);
-						});
+				if(count === 0) {
+					var stream = new Stream({term: req.query.term, total: 0});
+					twitterStream(stream);
+				}
+				else {
+					Stream.findOne({ term: req.query.term }, function(err, s) {
+						if(err)
+							console.log(err);
+						else {
+							twitterStream(s);
+						}
 					});
-
-					stream.on('error', function(err) {
-						console.log(err);
-					});
-					res.send("Client is streaming tweets");
-				});
+				}
 			}
 		});
+		
 	});
 
 	router.get('/stream/:term', function(req, res) {
