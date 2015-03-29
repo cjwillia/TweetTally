@@ -1,0 +1,65 @@
+var express = require('express');
+var router = express.Router();
+
+module.exports = function(models, client) {
+	var Stream = models.stream;
+
+	router.post('/', function(req, res) {
+
+		function twitterStream(stream) {
+			client.stream('statuses/filter', { track: stream.term }, function(s) {
+				s.on('data', function(tweet) {
+					stream.total++;
+					stream.save(function(err) {
+						if(err)
+							console.log(err);
+					})
+				});
+
+				s.on('error', function(err) {
+					console.log(err);
+				});
+				console.log("Client is streaming tweets");
+			});
+		}
+
+		Stream.count({term: req.body.term}, function(err, count) {
+			if(err)
+				console.log(err);
+			else {
+				if(count === 0) {
+					var stream = new Stream({term: req.body.term, total: 0});
+					stream.save(function(err) {
+						if(err)
+							console.log(err);
+						else
+							twitterStream(stream);
+					});
+				}
+				else {
+					Stream.findOne({ term: req.body.term }, function(err, s) {
+						if(err)
+							console.log(err);
+						else {
+							twitterStream(s);
+						}
+					});
+				}
+			}
+		});
+		
+	});
+
+	router.get('/:term', function(req, res) {
+		Stream.findOne({term: req.params.term}, function(err, s) {
+			if(err)
+				console.log(err);
+			else {
+				var res_obj = {n: s.total};
+				res.send(res_obj);
+			}
+		});
+	});
+
+	return router;
+}

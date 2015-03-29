@@ -15,7 +15,7 @@ var num_tweets = 0;
 var speed = 0;
 
 function getNewSpeed() {
-	$.getJSON('/tweets/stream/' + term, function(data) {
+	$.getJSON('stream/' + term, function(data) {
 		speed = (data.n - num_tweets) * 6 * 60;
 		$('#chart_div').html(speed+"");
 		num_tweets = data.n;
@@ -31,11 +31,11 @@ function updateTweets(data) {
 function start(msg) {
 	console.log(msg);
 
-	$.getJSON('/tweets/stream/' + term, updateTweets);
+	$.getJSON('stream/' + term, updateTweets);
 }
 
 
 function requestStream() {
 	
-	$.post('/tweets/stream', {'term': term}, start);
+	$.post('stream', {'term': term}, start);
 }

@@ -45,9 +45,11 @@ var User = models.User;
 
 var tweets = require('./tweets-router.js')(models, client);
 var graph = require('./graph-router.js')(models);
+var stream = require('./stream-router.js')
 
 app.use('/tweets', tweets);
 app.use('/graph', graph);
+app.use('/stream', stream);
 
 app.listen(app.get('port'), function() {
 	console.log("Node app is running locally on port: " + app.get('port'));
