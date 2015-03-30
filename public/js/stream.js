@@ -20,7 +20,7 @@ function formatNumSeconds(n) {
 	if(n % 60 === 0)
 		return n / 60 + ":00"
 	else
-		return Math.floor(n / 60) + ":" + n % 60 > 9 ? n % 60 : "0" + n % 60
+		return Math.floor(n / 60) + ":" + (n % 60 > 9 ? n % 60 : "0" + n % 60)
 }
 
 function getNewSpeed() {
