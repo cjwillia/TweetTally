@@ -13,18 +13,48 @@ function getCookie(cname) {
 var term = getCookie('term');
 var num_tweets = 0;
 var speed = 0;
+var x = 0;
+var dataTable;
+
+function formatNumSeconds(n) {
+	if(n % 60 === 0)
+		return n / 60 + ":00"
+	else
+		return Math.floor(n / 60) + ":" + n % 60 > 9 ? n % 60 : "0" + n % 60
+}
 
 function getNewSpeed() {
 	$.getJSON('stream/' + term, function(data) {
 		speed = (data.n - num_tweets) * 6 * 60;
-		$('#chart_div').html(speed+"");
 		num_tweets = data.n;
+		addNextSpeed();
+		draw();
 		setTimeout(getNewSpeed, 10000);
 	});
 }
 
+function addNextSpeed() {
+	dataTable.addRow(formatNumSeconds(x), speed);
+	x += 10;
+}
+
+function draw() {
+	var options = {
+		title: "Tweets/hour over Time",
+		width: 500,
+		height: 400
+	}
+	var chart = new google.visualization.LineChart($('#chart_div')[0]);
+	chart.draw(dataTable, options);
+}
+
 function updateTweets(data) {
 	num_tweets = data.n;
+	dataTable = new google.visualization.DataTable();
+	dataTable.addColumn('string', 'time');
+	dataTable.addColumn('number', 'speed');
+	addNextSpeed();
+	draw();
 	setTimeout(getNewSpeed, 10000);
 }
 
@@ -36,6 +66,7 @@ function start(msg) {
 
 
 function requestStream() {
-	
 	$.post('stream', {'term': term}, start);
 }
+
+google.setOnLoadCallback(requestStream);
