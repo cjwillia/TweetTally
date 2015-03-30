@@ -34,7 +34,7 @@ function getNewSpeed() {
 }
 
 function addNextSpeed() {
-	dataTable.addRow(formatNumSeconds(x), speed);
+	dataTable.addRow([formatNumSeconds(x), speed]);
 	x += 10;
 }
 
