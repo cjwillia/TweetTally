@@ -14,8 +14,8 @@ module.exports = function(models) {
 
 	});
 
-	router.get('/:term/stream', function(req, res) {
-		res.cookie('term', req.params.term);
+	router.get('/stream', function(req, res) {
+		res.cookie('term', req.query.term);
 		res.redirect('/stream.html');
 	});
 
