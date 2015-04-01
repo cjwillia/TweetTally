@@ -97,6 +97,7 @@ module.exports = function (mongoose) {
 
 	userSchema.methods.removeTweets = function() {
 		var i = this.children.length;
+		this.since_id = undefined;
 		while(i--) {
 			var tweet = this.children[i];
 			tweet.remove(function(err, t){

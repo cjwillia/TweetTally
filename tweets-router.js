@@ -19,13 +19,13 @@ module.exports = function(models, client) {
 		if(typeof user !== "undefined") {
 			var top = user.children[0];
 			if(typeof top !== "undefined") {
+				// if there are tweets in the DB that are not from today, delete them
 				var est = -4;
 				var d1 = util.dateShift(top.date, est);
 				var d2 = util.dateShift(new Date(), est);
 				if(util.dateCompare(d1, d2) !== 0) {
 					console.log("Removing DB Tweets...");
 					user.removeTweets();
-					user.since_id = undefined;
 				}
 			}
 
@@ -90,7 +90,7 @@ module.exports = function(models, client) {
 			res.send("No username received");
 		}
 		else {
-			var obj = { screen_name:req.body.handle };
+			var obj = { screen_name:req.body.handle.replace( /\W/g , '') };
 			console.log("Finding users...");
 			User.count({'handle': obj.screen_name}, function(err, count) {
 				if(err)

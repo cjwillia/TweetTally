@@ -29,7 +29,7 @@ module.exports = function(models, client) {
 				console.log(err);
 			else {
 				if(count === 0) {
-					var stream = new Stream({term: req.body.term, total: 0});
+					var stream = new Stream({term: req.body.term.replace( /\W/g , ''), total: 0});
 					stream.save(function(err) {
 						if(err)
 							console.log(err);
@@ -39,7 +39,7 @@ module.exports = function(models, client) {
 					});
 				}
 				else {
-					Stream.findOne({ term: req.body.term }, function(err, s) {
+					Stream.findOne({ term: req.body.term.replace( /\W/g , '') }, function(err, s) {
 						if(err)
 							console.log(err);
 						else {
@@ -53,7 +53,7 @@ module.exports = function(models, client) {
 	});
 
 	router.get('/:term', function(req, res) {
-		Stream.findOne({term: req.params.term}, function(err, s) {
+		Stream.findOne({term: req.params.term.replace( /\W/g , '')}, function(err, s) {
 			if(err)
 				console.log(err);
 			else {
