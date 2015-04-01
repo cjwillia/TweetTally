@@ -3,7 +3,7 @@ module.exports = function(models) {
 	var router = express.Router();
 
 	router.get('/stream', function(req, res) {
-		res.cookie('term', req.query.term);
+		res.cookie('term', req.query.term.replace( /\W/g , ''));
 		res.redirect('/stream.html');
 	});
 
