@@ -15,6 +15,7 @@ var num_tweets = 0;
 var speed = 0;
 var x = 0;
 var minute_tweets = 0;
+var last_minute = 0;
 var actual_tpm = 0;
 var dataTable;
 
@@ -39,10 +40,11 @@ function getNewSpeed() {
 function addNextSpeed() {
 	if(x % 60 === 0) {
 		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets]);
+		last_minute = minute_tweets;
 		minute_tweets = 0;
 	}	
 	else {
-		dataTable.addRow([formatNumSeconds(x), speed, undefined]);
+		dataTable.addRow([formatNumSeconds(x), speed, last_minute]);
 	}
 	x += 10;
 }
