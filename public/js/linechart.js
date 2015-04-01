@@ -19,9 +19,11 @@ function drawChart() {
     data.addRows(rows);
 
     // Set chart options
-    var options = {'title':'Tweets per Hour for ' + user,
-    'width':500,
-    'height':400};
+    var options = {
+        title : 'Tweets per Hour for ' + user,
+        xAxis : {title : 'Hour'},
+        yAxis : {title : 'Tweets'}
+    }
 
     // Instantiate and draw our chart, passing in some options.
     var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
