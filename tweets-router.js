@@ -18,9 +18,9 @@ module.exports = function(models, client) {
 	function getTweets(user, res) {
 		if(typeof user !== "undefined") {
 			var top = user.children[0];
-			if(top) {
+			if(typeof top !== "undefined") {
 				var est = -4;
-				var d1 = util.dateShift(top.date, est);
+				var d1 = util.dateShift(new Date(top.date), est);
 				var d2 = util.dateShift(new Date(), est);
 				if(util.dateCompare(d1, d2) !== 0) {
 					user.removeTweets();
