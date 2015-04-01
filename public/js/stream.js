@@ -29,7 +29,7 @@ function getNewSpeed() {
 	$.getJSON('stream/' + term, function(data) {
 		speed = (data.n - num_tweets) * 6;
 		num_tweets = data.n;
-		minute_tweets += data.n;
+		minute_tweets += data.n - num_tweets;
 		addNextSpeed();
 		draw();
 		setTimeout(getNewSpeed, 10000);
