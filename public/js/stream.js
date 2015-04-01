@@ -14,6 +14,8 @@ var term = getCookie('term');
 var num_tweets = 0;
 var speed = 0;
 var x = 0;
+var minute_tweets = 0;
+var actual_tpm = 0;
 var dataTable;
 
 function formatNumSeconds(n) {
@@ -25,8 +27,9 @@ function formatNumSeconds(n) {
 
 function getNewSpeed() {
 	$.getJSON('stream/' + term, function(data) {
-		speed = (data.n - num_tweets) * 6 * 60;
+		speed = (data.n - num_tweets) * 6;
 		num_tweets = data.n;
+		minute_tweets += num_tweets;
 		addNextSpeed();
 		draw();
 		setTimeout(getNewSpeed, 10000);
@@ -34,13 +37,19 @@ function getNewSpeed() {
 }
 
 function addNextSpeed() {
-	dataTable.addRow([formatNumSeconds(x), speed]);
-	x += 10;
+	if(x > 0 && x % 60 == 0) {
+		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets]);
+		minute_tweets = 0;
+	}	
+	else {
+		dataTable.addRow([formatNumSeconds(x), speed, undefined]);
+		x += 10;
+	}
 }
 
 function draw() {
 	var options = {
-		title: "Tweets/hour over Time",
+		title: "Tweets/minute over Time: '" + term + "'",
 		width: 500,
 		height: 400
 	}
@@ -50,9 +59,11 @@ function draw() {
 
 function updateTweets(data) {
 	num_tweets = data.n;
+	minute_tweets = num_tweets;
 	dataTable = new google.visualization.DataTable();
 	dataTable.addColumn('string', 'time');
-	dataTable.addColumn('number', 'speed');
+	dataTable.addColumn('number', 'TPM');
+	dataTable.addColumn('number', 'actual');
 	addNextSpeed();
 	draw();
 	setTimeout(getNewSpeed, 10000);
