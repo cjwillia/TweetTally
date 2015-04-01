@@ -15,7 +15,6 @@ var num_tweets = 0;
 var speed = 0;
 var x = 0;
 var minute_tweets = 0;
-var last_minute = 0;
 var actual_tpm = 0;
 var dataTable;
 
@@ -28,8 +27,10 @@ function formatNumSeconds(n) {
 
 function getNewSpeed() {
 	$.getJSON('stream/' + term, function(data) {
-		speed = (data.n - num_tweets) * 6;
-		minute_tweets += data.n - num_tweets;
+		var tweets_since = data.n - num_tweets;
+		minute_tweets += tweets_since;
+		speed = (tweets_since) * 6;
+		actual_tpm += minute_tweets;
 		num_tweets = data.n;
 		addNextSpeed();
 		draw();
@@ -39,11 +40,12 @@ function getNewSpeed() {
 
 function addNextSpeed() {
 	if(x % 60 === 0) {
-		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets]);
-		minute_tweets = 0;
+		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets, actual_tpm]);
+		actual_tpm = 0;
+
 	}	
 	else {
-		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets]);
+		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets, undefined]);
 	}
 	x += 10;
 }
@@ -64,6 +66,7 @@ function updateTweets(data) {
 	dataTable.addColumn('string', 'time');
 	dataTable.addColumn('number', 'TPM');
 	dataTable.addColumn('number', 'actual tweets');
+	dataTable.addColumn('number', 'actual tweets/minute');
 	addNextSpeed();
 	draw();
 	setTimeout(getNewSpeed, 10000);
