@@ -40,11 +40,10 @@ function getNewSpeed() {
 function addNextSpeed() {
 	if(x % 60 === 0) {
 		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets]);
-		last_minute = minute_tweets;
 		minute_tweets = 0;
 	}	
 	else {
-		dataTable.addRow([formatNumSeconds(x), speed, last_minute]);
+		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets]);
 	}
 	x += 10;
 }
@@ -61,11 +60,10 @@ function draw() {
 
 function updateTweets(data) {
 	num_tweets = data.n;
-	minute_tweets += data.n;
 	dataTable = new google.visualization.DataTable();
 	dataTable.addColumn('string', 'time');
 	dataTable.addColumn('number', 'TPM');
-	dataTable.addColumn('number', 'actual');
+	dataTable.addColumn('number', 'actual tweets');
 	addNextSpeed();
 	draw();
 	setTimeout(getNewSpeed, 10000);
