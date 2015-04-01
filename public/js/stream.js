@@ -54,7 +54,13 @@ function draw() {
 	var options = {
 		title: "Tweets/minute over Time: '" + term + "'",
 		width: 500,
-		height: 400
+		height: 400,
+		trendlines: {
+			0: {
+				type: 'linear',
+				color: '#99f'
+			}
+		}
 	}
 	var chart = new google.visualization.LineChart($('#chart_div')[0]);
 	chart.draw(dataTable, options);
