@@ -21,8 +21,8 @@ function drawChart() {
     // Set chart options
     var options = {
         title : 'Tweets per Hour for ' + user,
-        xAxis : {title : 'Hour'},
-        yAxis : {title : 'Tweets'}
+        hAxis : {title : 'Hour'},
+        vAxis : {title : 'Tweets'}
     }
 
     // Instantiate and draw our chart, passing in some options.

@@ -54,7 +54,7 @@ function draw() {
 	var options = {
 		title: "Tweets/minute over Time: '" + term + "'",
 		vAxis: {title : "Tweets"},
-		xAxis: {title : "Time"}
+		hAxis: {title : "Time"}
 	}
 	var chart = new google.visualization.LineChart($('#chart_div')[0]);
 	chart.draw(dataTable, options);
