@@ -20,9 +20,10 @@ module.exports = function(models, client) {
 			var top = user.children[0];
 			if(typeof top !== "undefined") {
 				var est = -4;
-				var d1 = util.dateShift(new Date(top.date), est);
+				var d1 = util.dateShift(top.date, est);
 				var d2 = util.dateShift(new Date(), est);
 				if(util.dateCompare(d1, d2) !== 0) {
+					console.log("Removing DB Tweets...");
 					user.removeTweets();
 					user.since_id = undefined;
 				}
