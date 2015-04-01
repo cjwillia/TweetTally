@@ -30,7 +30,7 @@ function getNewSpeed() {
 		var tweets_since = data.n - num_tweets;
 		minute_tweets += tweets_since;
 		speed = (tweets_since) * 6;
-		actual_tpm += minute_tweets;
+		actual_tpm += tweets_since;
 		num_tweets = data.n;
 		addNextSpeed();
 		draw();
