@@ -37,14 +37,14 @@ function getNewSpeed() {
 }
 
 function addNextSpeed() {
-	if(x > 0 && x % 60 == 0) {
+	if(x % 60 == 0) {
 		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets]);
 		minute_tweets = 0;
 	}	
 	else {
 		dataTable.addRow([formatNumSeconds(x), speed, undefined]);
-		x += 10;
 	}
+	x += 10;
 }
 
 function draw() {
