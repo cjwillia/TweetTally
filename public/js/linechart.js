@@ -19,7 +19,7 @@ function drawChart() {
     data.addRows(rows);
 
     // Set chart options
-    var options = {'title':'Tweets per Hour',
+    var options = {'title':'Tweets per Hour for ' + user,
     'width':500,
     'height':400};
 

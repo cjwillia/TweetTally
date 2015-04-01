@@ -10,6 +10,7 @@ function getCookie(cname) {
     }
     return "";
 }
+var user = getCookie('user');
 
 function loadTweets(data) {
     var t = data.tweets;
@@ -23,5 +24,5 @@ function loadTweets(data) {
 }
 
 function getDBTweets() {
-	$.getJSON('/tweets/' + getCookie('user'), loadTweets);
+	$.getJSON('/tweets/' + user, loadTweets);
 }

@@ -29,7 +29,7 @@ function getNewSpeed() {
 	$.getJSON('stream/' + term, function(data) {
 		speed = (data.n - num_tweets) * 6;
 		num_tweets = data.n;
-		minute_tweets += num_tweets;
+		minute_tweets += data.n;
 		addNextSpeed();
 		draw();
 		setTimeout(getNewSpeed, 10000);
@@ -37,7 +37,7 @@ function getNewSpeed() {
 }
 
 function addNextSpeed() {
-	if(x % 60 == 0) {
+	if(x % 60 === 0) {
 		dataTable.addRow([formatNumSeconds(x), speed, minute_tweets]);
 		minute_tweets = 0;
 	}	
@@ -59,7 +59,7 @@ function draw() {
 
 function updateTweets(data) {
 	num_tweets = data.n;
-	minute_tweets = num_tweets;
+	minute_tweets += data.n;
 	dataTable = new google.visualization.DataTable();
 	dataTable.addColumn('string', 'time');
 	dataTable.addColumn('number', 'TPM');
