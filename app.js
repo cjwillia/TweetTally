@@ -36,8 +36,6 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
 var models = require('./db.js')(mongoose);
-var Tweet = models.Tweet;
-var User = models.User;
 
 ////////////////////
 // Routes
