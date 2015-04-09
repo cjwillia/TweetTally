@@ -21,8 +21,27 @@ function loadTweets(data) {
     });
     tweets = t;
     drawChart();
+    fillTable();
 }
 
 function getDBTweets() {
 	$.getJSON('/tweets/' + user, loadTweets);
+}
+
+function fillTable() {
+    var table = $("#data");
+    var obj = {};
+    tweets.forEach(function(tweet) {
+        if(obj[tweet.hour]) {
+            obj[tweet.hour]++;
+        }
+        else {
+            obj[tweet.hour] = 1;
+        }
+    });
+    obj.forEach(function(v,k) {
+        var row = $("<tr>");
+        row.append($("<td>").html(k.toString() + ":00"));
+        row.append($("<td>").html(v.toString()));
+    });
 }
