@@ -6,7 +6,13 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12">
-				<h2>Welcome to Tweet Tally!</h2>
+				<h2>Twitter Grapher</h2>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12">
+				<h4><i>a quick twitter analyzer</i></h4>
 			</div>
 		</div>
 
@@ -21,34 +27,42 @@
 
 		<div class="row">
 			<div class="col-sm-6">
-				<form action="/graph/stream" method="GET">
-					<div class="row">
-						<div class="col-sm-12">
-							<input name="term" type="text">
-						</div>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<form action="/graph/stream" method="GET">
+							<div class="row">
+								<div class="col-sm-12">
+									<input name="term" type="text">
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-sm-12">
+									<input type="submit" class="btn btn-primary" value="Search">
+								</div>
+							</div>
+						</form>
 					</div>
-					<br />
-					<div class="row">
-						<div class="col-sm-12">
-							<input type="submit" class="btn btn-primary" value="Search">
-						</div>
-					</div>
-				</form>
+				</div>
 			</div>
 			<div class="col-sm-6">
-				<form action="/tweets" method="POST">
-					<div class="row">
-						<div class="col-sm-12">
-							<input name="handle" type="text">
-						</div>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<form action="/tweets" method="POST">
+							<div class="row">
+								<div class="col-sm-12">
+									<input name="handle" type="text">
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-sm-12">
+									<input type="submit" class="btn btn-primary" value="Collect Tweets">
+								</div>						
+							</div>
+						</form>
 					</div>
-					<br />
-					<div class="row">
-						<div class="col-sm-12">
-							<input type="submit" class="btn btn-primary" value="Collect Tweets">
-						</div>						
-					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 	</div>
